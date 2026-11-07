@@ -62,6 +62,7 @@ body {
     text-align: center;
     font-size: 13px;
     color: #64748b;
+    word-break: break-all;
 }
 
 button {
@@ -74,6 +75,15 @@ button {
     font-family: inherit;
     font-weight: bold;
     cursor: pointer;
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
 }
 
 .neshan {
@@ -96,16 +106,13 @@ button {
     color: #475569;
 }
 
-button:active {
-    transform: scale(.98);
-}
-
 .status {
     text-align: center;
     font-size: 12px;
     line-height: 2;
     color: #64748b;
     margin-top: 15px;
+    min-height: 48px;
 }
 
 .footer {
@@ -136,24 +143,24 @@ button:active {
         </div>
     </div>
 
-    <button class="neshan" onclick="openNeshan()">
+    <button class="neshan" id="neshanButton" onclick="openNeshan()">
         مسیریابی با نشان
     </button>
 
-    <button class="balad" onclick="openBalad()">
+    <button class="balad" id="baladButton" onclick="openBalad()">
         بازکردن بلد و کپی مختصات
     </button>
 
-    <button class="google" onclick="openGoogle()">
+    <button class="google" id="googleButton" onclick="openGoogle()">
         مسیریابی با گوگل‌مپ
     </button>
 
-    <button class="secondary" onclick="copyCoordinates()">
+    <button class="secondary" id="copyButton" onclick="copyCoordinates()">
         کپی مختصات مقصد
     </button>
 
     <div class="status" id="status">
-        برای مسیریابی، دسترسی موقعیت مکانی گوشی را فعال کنید.
+        برای مسیریابی، GPS و دسترسی موقعیت مکانی گوشی را فعال کنید.
     </div>
 
     <div class="footer">
@@ -168,127 +175,248 @@ var params = new URLSearchParams(window.location.search);
 var lat = parseFloat(params.get('lat'));
 var lng = parseFloat(params.get('lng'));
 
-var originLat = null;
-var originLng = null;
-
 var coordinates = document.getElementById('coordinates');
 var statusBox = document.getElementById('status');
 
-if (
-    !Number.isFinite(lat) ||
-    !Number.isFinite(lng) ||
-    lat < -90 || lat > 90 ||
-    lng < -180 || lng > 180 ||
-    (lat === 0 && lng === 0)
-) {
+var validDestination =
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat >= -90 && lat <= 90 &&
+    lng >= -180 && lng <= 180 &&
+    !(lat === 0 && lng === 0);
+
+if (!validDestination) {
+
     coordinates.textContent = 'مختصات مقصد معتبر نیست.';
-    statusBox.textContent = 'لطفاً QR صحیح را اسکن کنید.';
+    statusBox.textContent = 'لطفاً QR صحیح برگه آدرس را اسکن کنید.';
+
     document.querySelectorAll('button').forEach(function(button) {
         button.disabled = true;
-        button.style.opacity = '.4';
     });
+
 } else {
-    coordinates.textContent = lat + ' , ' + lng;
+
+    coordinates.textContent =
+        lat.toFixed(6) + ' , ' + lng.toFixed(6);
+
+}
+
+function setStatus(message) {
+    statusBox.textContent = message;
 }
 
 function getOrigin(callback) {
+
     if (!navigator.geolocation) {
-        statusBox.textContent = 'این مرورگر از GPS پشتیبانی نمی‌کند.';
+        setStatus('مرورگر از GPS پشتیبانی نمی‌کند.');
         callback(null, null);
         return;
     }
 
-    statusBox.textContent = 'در حال دریافت موقعیت فعلی گوشی...';
+    setStatus('در حال دریافت موقعیت فعلی گوشی...');
 
     navigator.geolocation.getCurrentPosition(
-        function(position) {
-            originLat = position.coords.latitude;
-            originLng = position.coords.longitude;
 
-            statusBox.textContent = 'موقعیت فعلی گوشی دریافت شد.';
+        function(position) {
+
+            var originLat = position.coords.latitude;
+            var originLng = position.coords.longitude;
+
+            setStatus('موقعیت فعلی گوشی دریافت شد. در حال باز کردن مسیریاب...');
+
             callback(originLat, originLng);
         },
-        function() {
-            statusBox.textContent =
-                'موقعیت دریافت نشد؛ مسیریاب را باز کنید و GPS را فعال کنید.';
+
+        function(error) {
+
+            var message = 'موقعیت گوشی دریافت نشد.';
+
+            if (error.code === 1) {
+                message = 'دسترسی GPS برای مرورگر مجاز نیست.';
+            } else if (error.code === 2) {
+                message = 'موقعیت فعلی پیدا نشد. GPS و اینترنت را بررسی کنید.';
+            } else if (error.code === 3) {
+                message = 'زمان دریافت موقعیت تمام شد.';
+            }
+
+            setStatus(message);
             callback(null, null);
         },
+
         {
             enableHighAccuracy: true,
-            timeout: 12000,
-            maximumAge: 0
+            timeout: 20000,
+            maximumAge: 30000
         }
     );
 }
 
 function openNeshan() {
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-    getOrigin(function(oLat, oLng) {
+    if (!validDestination) return;
+
+    getOrigin(function(originLat, originLng) {
+
         var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-        if (oLat !== null && oLng !== null) {
+        var destination = lat + ',' + lng;
+
+        if (originLat !== null && originLng !== null) {
+
+            var origin = originLat + ',' + originLng;
+
             if (isIOS) {
-                var url = 'neshan://?origin=' +
-                    oLat + ',' + oLng +
-                    '&destination=' + lat + ',' + lng;
 
-                window.location.href = url;
+                var url =
+                    'neshan://?origin=' +
+                    encodeURIComponent(origin) +
+                    '&destination=' +
+                    encodeURIComponent(destination);
+
             } else {
-                var url = 'https://nshn.ir/?origin=' +
-                    oLat + ',' + oLng +
-                    '&destination=' + lat + ',' + lng;
 
-                window.location.href = url;
+                var url =
+                    'https://nshn.ir/?origin=' +
+                    encodeURIComponent(origin) +
+                    '&destination=' +
+                    encodeURIComponent(destination);
+
             }
+
+            window.location.href = url;
+
         } else {
+
+            setStatus('مبدأ دریافت نشد؛ مقصد را در نشان باز می‌کنیم.');
+
             if (isIOS) {
+
                 window.location.href =
-                    'neshan://?destination=' + lat + ',' + lng;
+                    'neshan://?destination=' +
+                    encodeURIComponent(destination);
+
             } else {
+
                 window.location.href =
-                    'https://nshn.ir?lat=' + lat + '&lng=' + lng;
+                    'https://nshn.ir/?lat=' +
+                    encodeURIComponent(lat) +
+                    '&lng=' +
+                    encodeURIComponent(lng);
+
             }
         }
+
     });
 }
 
 function openGoogle() {
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-    var url = 'https://www.google.com/maps/dir/?api=1' +
-        '&destination=' + encodeURIComponent(lat + ',' + lng) +
-        '&travelmode=driving';
+    if (!validDestination) return;
 
-    window.location.href = url;
+    getOrigin(function(originLat, originLng) {
+
+        var url =
+            'https://www.google.com/maps/dir/?api=1' +
+            '&destination=' +
+            encodeURIComponent(lat + ',' + lng) +
+            '&travelmode=driving';
+
+        if (originLat !== null && originLng !== null) {
+            url += '&origin=' +
+                encodeURIComponent(originLat + ',' + originLng);
+        }
+
+        window.location.href = url;
+
+    });
 }
 
-function openBalad() {
-    copyCoordinates();
-
-    statusBox.textContent =
-        'مختصات کپی شد. در بلد مقصد را جست‌وجو یا وارد کنید.';
-
-    window.location.href = 'https://balad.ir/';
-}
-
-function copyCoordinates() {
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-
-    var value = lat + ',' + lng;
+function copyText(value, callback) {
 
     if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(value).then(function() {
-            statusBox.textContent = 'مختصات مقصد کپی شد.';
-        }).catch(function() {
-            statusBox.textContent = 'مختصات: ' + value;
-        });
+
+        navigator.clipboard.writeText(value).then(
+
+            function() {
+                callback(true);
+            },
+
+            function() {
+                callback(fallbackCopy(value));
+            }
+
+        );
+
     } else {
-        statusBox.textContent = 'مختصات مقصد: ' + value;
+
+        callback(fallbackCopy(value));
+
     }
 }
 
-    
+function fallbackCopy(value) {
+
+    var input = document.createElement('textarea');
+
+    input.value = value;
+    input.style.position = 'fixed';
+    input.style.opacity = '0';
+
+    document.body.appendChild(input);
+
+    input.focus();
+    input.select();
+
+    var success = false;
+
+    try {
+        success = document.execCommand('copy');
+    } catch (e) {
+        success = false;
+    }
+
+    document.body.removeChild(input);
+
+    return success;
+}
+
+function copyCoordinates() {
+
+    if (!validDestination) return;
+
+    var value = lat + ',' + lng;
+
+    copyText(value, function(success) {
+
+        if (success) {
+            setStatus('مختصات مقصد با موفقیت کپی شد.');
+        } else {
+            setStatus('کپی خودکار انجام نشد. مختصات: ' + value);
+        }
+
+    });
+}
+
+function openBalad() {
+
+    if (!validDestination) return;
+
+    var value = lat + ',' + lng;
+
+    setStatus('در حال کپی مختصات و باز کردن بلد...');
+
+    copyText(value, function(success) {
+
+        if (success) {
+            setStatus('مختصات کپی شد. در بلد مقصد را وارد کنید.');
+        } else {
+            setStatus('بلد باز می‌شود؛ مختصات را از صفحه قبلی بردارید.');
+        }
+
+        window.location.href = 'https://balad.ir/';
+
+    });
+}
 </script>
 
 </body>

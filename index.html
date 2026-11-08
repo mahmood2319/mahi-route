@@ -345,6 +345,7 @@ if (destinationIsValid) {
 
 
 /* مسیریابی با نشان */
+/* مسیریابی با نشان */
 
 function openNeshan() {
 
@@ -353,18 +354,14 @@ function openNeshan() {
         return;
     }
 
-    var origin = ORIGIN_LAT + ',' + ORIGIN_LNG;
-    var destination = lat + ',' + lng;
-
     var url =
         'https://nshn.ir/?origin=' +
-        encodeURIComponent(origin) +
+        ORIGIN_LAT + ',' + ORIGIN_LNG +
         '&destination=' +
-        encodeURIComponent(destination);
+        lat + ',' + lng;
 
     window.location.href = url;
 }
-
 
 /* نمایش مقصد در بلد */
 

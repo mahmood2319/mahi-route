@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>مسیریابی نشر ماهی</title>
 
 <style>
@@ -22,90 +23,75 @@ body {
 .container {
     width: 100%;
     max-width: 430px;
-    margin: 25px auto;
-}
-
-.card {
+    margin: 20px auto;
     background: #ffffff;
     border-radius: 18px;
     padding: 25px 20px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.07);
-    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
 }
 
-h1 {
-    font-size: 21px;
-    margin: 8px 0;
-    color: #263548;
+.logo {
+    text-align: center;
+    color: #a34c32;
+    font-size: 23px;
+    font-weight: bold;
+    margin-bottom: 8px;
 }
 
 .subtitle {
+    text-align: center;
     color: #64748b;
     font-size: 13px;
-    line-height: 2;
-    margin-bottom: 22px;
+    margin-bottom: 25px;
 }
 
-.location {
+.info {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    padding: 13px;
-    margin-bottom: 12px;
-    text-align: right;
+    padding: 14px;
+    margin-bottom: 18px;
+    line-height: 2;
+    font-size: 13px;
 }
 
-.location-title {
-    font-size: 12px;
-    color: #64748b;
-    margin-bottom: 7px;
+.info strong {
+    color: #334155;
 }
 
 .coordinates {
     direction: ltr;
     text-align: left;
+    color: #64748b;
     font-size: 12px;
-    color: #334155;
-    overflow-wrap: anywhere;
-}
-
-.buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 11px;
-    margin-top: 22px;
+    word-break: break-all;
 }
 
 button {
+    display: block;
     width: 100%;
     border: 0;
-    border-radius: 12px;
-    padding: 15px;
+    border-radius: 11px;
+    padding: 15px 12px;
+    margin-top: 12px;
+    font-family: inherit;
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    font-family: inherit;
-}
-
-.browser {
-    background: #263b50;
-    color: white;
-    border: 2px solid #d6a84b;
-    margin-bottom: 12px;
 }
 
 .neshan {
-    background: #e65335;
+    background: #b94732;
     color: white;
 }
 
 .balad {
-    background: #1677d2;
+    background: #16865b;
     color: white;
 }
 
 .google {
-    background: #18865b;
+    background: #2563eb;
     color: white;
 }
 
@@ -113,18 +99,22 @@ button:active {
     transform: scale(0.98);
 }
 
-.status {
-    margin-top: 17px;
-    font-size: 12px;
-    line-height: 2;
-    color: #64748b;
-    min-height: 25px;
-}
-
 .footer {
-    margin-top: 22px;
+    text-align: center;
     color: #94a3b8;
     font-size: 11px;
+    margin-top: 25px;
+}
+
+.error {
+    display: none;
+    color: #b91c1c;
+    background: #fef2f2;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 2;
 }
 </style>
 </head>
@@ -132,167 +122,110 @@ button:active {
 <body>
 
 <div class="container">
-    <div class="card">
 
-        <h1>مسیریابی نشر ماهی</h1>
+    <div class="logo">انتشارات ماهی</div>
 
-        <div class="subtitle">
-            مقصد تحویل مرسوله را انتخاب کنید و مسیر را مشاهده کنید.
-        </div>
-
-        <div class="location">
-            <div class="location-title">مبدأ حرکت؛ دفتر نشر ماهی</div>
-            <div class="coordinates" id="originCoordinates"></div>
-        </div>
-
-        <div class="location">
-            <div class="location-title">مقصد تحویل مرسوله</div>
-            <div class="coordinates" id="destinationCoordinates"></div>
-        </div>
-
-        <div class="buttons">
-
-            <button class="browser" onclick="openChrome()">
-                باز کردن صفحه در مرورگر اصلی گوشی
-            </button>
-
-            <button class="neshan" onclick="openNeshan()">
-                مسیریابی با نشان
-            </button>
-
-            <button class="balad" onclick="openBalad()">
-                مسیریابی با بلد
-            </button>
-
-            <button class="google" onclick="openGoogle()">
-                مسیریابی با گوگل‌مپ
-            </button>
-
-        </div>
-
-        <div class="status" id="status">
-            اطلاعات مقصد دریافت شد.
-        </div>
-
-        <div class="footer">
-            انتشارات ماهی · ناشر کتاب‌های خوب
-        </div>
-
+    <div class="subtitle">
+        سامانه مسیریابی مرسولات
     </div>
+
+    <div class="info">
+        <div>
+            <strong>مبدأ:</strong>
+            دفتر انتشارات ماهی
+        </div>
+
+        <div>
+            <strong>مقصد:</strong>
+            آدرس مشتری
+        </div>
+
+        <div class="coordinates" id="destinationCoordinates">
+            در حال دریافت مختصات...
+        </div>
+    </div>
+
+    <div class="error" id="errorBox">
+        مختصات مقصد در کد QR وجود ندارد یا معتبر نیست.
+    </div>
+
+    <button class="neshan" onclick="openNeshan()">
+        مسیریابی با نشان
+    </button>
+
+    <button class="balad" onclick="openBalad()">
+        نمایش مقصد در بلد
+    </button>
+
+    <button class="google" onclick="openGoogle()">
+        مسیریابی با گوگل‌مپ
+    </button>
+
+    <div class="footer">
+        انتشارات ماهی · ناشر کتاب‌های خوب
+    </div>
+
 </div>
 
 <script>
+/* مختصات ثابت دفتر انتشارات ماهی */
+var ORIGIN_LAT = 35.70129294788876;
+var ORIGIN_LNG = 51.398984197047696;
 
-/* مختصات دفتر نشر ماهی */
-
-var defaultOriginLat = 35.70129294788876;
-var defaultOriginLng = 51.398984197047696;
-
-/* دریافت مختصات QR */
-
+/* دریافت مختصات مقصد از QR */
 var params = new URLSearchParams(window.location.search);
 
 var lat = parseFloat(params.get('lat'));
 var lng = parseFloat(params.get('lng'));
 
-var originLat = parseFloat(params.get('origin_lat'));
-var originLng = parseFloat(params.get('origin_lng'));
-
-if (!isFinite(originLat) || !isFinite(originLng)) {
-    originLat = defaultOriginLat;
-    originLng = defaultOriginLng;
+/* بررسی معتبر بودن مختصات */
+function validCoordinates(latitude, longitude) {
+    return isFinite(latitude) &&
+           isFinite(longitude) &&
+           latitude >= -90 &&
+           latitude <= 90 &&
+           longitude >= -180 &&
+           longitude <= 180;
 }
 
-var validDestination =
-    isFinite(lat) &&
-    isFinite(lng) &&
-    lat >= -90 &&
-    lat <= 90 &&
-    lng >= -180 &&
-    lng <= 180;
+var destinationIsValid = validCoordinates(lat, lng);
 
-var validOrigin =
-    isFinite(originLat) &&
-    isFinite(originLng) &&
-    originLat >= -90 &&
-    originLat <= 90 &&
-    originLng >= -180 &&
-    originLng <= 180;
-
-/* نمایش مختصات */
-
-document.getElementById('originCoordinates').textContent =
-    originLat + ', ' + originLng;
-
-if (validDestination) {
-
-    document.getElementById('destinationCoordinates').textContent =
-        lat + ', ' + lng;
-
+if (destinationIsValid) {
+    document.getElementById('destinationCoordinates').innerHTML =
+        lat + ' , ' + lng;
 } else {
+    document.getElementById('errorBox').style.display = 'block';
 
-    document.getElementById('destinationCoordinates').textContent =
-        'مختصات مقصد معتبر نیست';
-
-    document.getElementById('status').textContent =
-        'خطا: اطلاعات مقصد در QR وجود ندارد.';
-
-}
-
-/* وضعیت صفحه */
-
-function showStatus(message) {
-    document.getElementById('status').textContent = message;
-}
-
-/* باز کردن صفحه در Chrome اندروید */
-
-function openChrome() {
-
-    var currentUrl = window.location.href;
-
-    if (!/^https?:\/\//i.test(currentUrl)) {
-        showStatus('آدرس صفحه معتبر نیست.');
-        return;
-    }
-
-    var chromeUrl =
-        'intent://' +
-        currentUrl.replace(/^https?:\/\//i, '') +
-        '#Intent;' +
-        'scheme=https;' +
-        'package=com.android.chrome;' +
-        'S.browser_fallback_url=' +
-        encodeURIComponent(currentUrl) +
-        ';end';
-
-    showStatus('در حال تلاش برای باز کردن Chrome...');
-
-    window.location.href = chromeUrl;
+    document.getElementById('destinationCoordinates').innerHTML =
+        'مختصات نامعتبر';
 }
 
 /* مسیریابی با نشان */
-
 function openNeshan() {
-    if (!lat || !lng) {
+
+    if (!destinationIsValid) {
         alert('مختصات مقصد معتبر نیست.');
         return;
     }
 
-    var url = 'https://nshn.ir/?lat=' +
-        encodeURIComponent(lat) +
-        '&lng=' +
-        encodeURIComponent(lng);
+    var origin = ORIGIN_LAT + ',' + ORIGIN_LNG;
+    var destination = lat + ',' + lng;
+
+    var url =
+        'https://nshn.ir/maps?origin=' +
+        encodeURIComponent(origin) +
+        '&destination=' +
+        encodeURIComponent(destination) +
+        '&type=drive';
 
     window.location.href = url;
 }
 
-/* مسیریابی با بلد */
-
+/* نمایش مقصد در بلد */
 function openBalad() {
 
-    if (!validDestination) {
-        showStatus('مختصات مقصد معتبر نیست.');
+    if (!destinationIsValid) {
+        alert('مختصات مقصد معتبر نیست.');
         return;
     }
 
@@ -302,21 +235,18 @@ function openBalad() {
         '&longitude=' +
         encodeURIComponent(lng);
 
-    showStatus('در حال باز کردن مقصد در بلد...');
-
     window.location.href = url;
 }
 
 /* مسیریابی با گوگل‌مپ */
-
 function openGoogle() {
 
-    if (!validDestination || !validOrigin) {
-        showStatus('مختصات مبدأ یا مقصد معتبر نیست.');
+    if (!destinationIsValid) {
+        alert('مختصات مقصد معتبر نیست.');
         return;
     }
 
-    var origin = originLat + ',' + originLng;
+    var origin = ORIGIN_LAT + ',' + ORIGIN_LNG;
     var destination = lat + ',' + lng;
 
     var url =
@@ -325,11 +255,8 @@ function openGoogle() {
         '&destination=' + encodeURIComponent(destination) +
         '&travelmode=driving';
 
-    showStatus('در حال باز کردن گوگل‌مپ...');
-
     window.location.href = url;
 }
-
 </script>
 
 </body>

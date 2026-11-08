@@ -346,6 +346,7 @@ if (destinationIsValid) {
 
 /* مسیریابی با نشان */
 
+/* مسیریابی با نشان */
 
 function openNeshan() {
 
@@ -354,12 +355,24 @@ function openNeshan() {
         return;
     }
 
+    // ساخت لینک دقیق مسیریابی نشان
     var url = 'https://nshn.ir/?origin=' +
         ORIGIN_LAT + ',' + ORIGIN_LNG +
         '&destination=' +
         lat + ',' + lng;
 
-    window.location.assign(url);
+    // باز کردن نشان در زبانه جدید
+    var link = document.createElement('a');
+
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
 }
 /* نمایش مقصد در بلد */
 

@@ -263,9 +263,10 @@ h1 {
     document.getElementById('neshanBtn').href = neshanUrl;
 
 // بلد ـ مسیریابی مستقیم از دفتر نشر ماهی تا مقصد
+// بلد ـ مسیریابی مستقیم از پلاک ۱۱۷۶، ساختمان سپیده
 var destParts = dest.split(',');
 
-var baladOrigin = '51.399609,35.700698';
+var baladOrigin = '51.399384201982855,35.70069985705295';
 var baladDestination = destParts[1] + ',' + destParts[0];
 
 var baladUrl =
@@ -275,6 +276,8 @@ var baladUrl =
     encodeURIComponent(baladDestination);
 
 document.getElementById('baladBtn').href = baladUrl;
+
+    
     // گوگل‌مپ
     var googleUrl =
         'https://www.google.com/maps/dir/?api=1' +

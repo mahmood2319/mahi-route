@@ -7,9 +7,7 @@
 <title>مسیریابی نشر ماهی</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
@@ -49,18 +47,19 @@ body {
     background: #f1f5f9;
     border-radius: 12px;
     padding: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    line-height: 2;
 }
 
 .destination strong {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .coordinates {
     direction: ltr;
     text-align: center;
-    font-size: 13px;
+    font-size: 12px;
     color: #64748b;
     overflow-wrap: anywhere;
 }
@@ -131,13 +130,18 @@ button:disabled {
         <h1>مسیریابی مقصد</h1>
         <p>
             برگه آدرس پیک نشر ماهی<br>
-            مسیریاب موردنظر خود را انتخاب کنید.
+            مسیر از دفتر نشر ماهی تا مقصد تحویل
         </p>
     </div>
 
     <div class="destination">
+        <strong>مبدأ حرکت: دفتر نشر ماهی</strong>
+        <div class="coordinates" id="originCoordinates"></div>
+    </div>
+
+    <div class="destination">
         <strong>مقصد تحویل مرسوله</strong>
-        <div class="coordinates" id="coordinates">
+        <div class="coordinates" id="destinationCoordinates">
             در حال دریافت اطلاعات مقصد...
         </div>
     </div>
@@ -159,7 +163,7 @@ button:disabled {
     </button>
 
     <div class="status" id="status">
-        موقعیت فعلی از GPS برنامه مسیریاب دریافت می‌شود.
+        مبدأ ثابت دفتر است. مقصد از QR دریافت می‌شود.
     </div>
 
     <div class="footer">
@@ -170,12 +174,32 @@ button:disabled {
 
 <script>
 
+/* مختصات ثابت دفتر نشر ماهی */
+
+var defaultOriginLat = 35.70129294788876;
+var defaultOriginLng = 51.398984197047696;
+
+
+/* دریافت اطلاعات QR */
+
 var params = new URLSearchParams(window.location.search);
 
 var lat = parseFloat(params.get('lat'));
 var lng = parseFloat(params.get('lng'));
 
-var coordinates = document.getElementById('coordinates');
+/* در صورت وجود مختصات مبدأ در QR، همان استفاده می‌شود.
+   در غیر این صورت مبدأ ثابت دفتر استفاده می‌شود. */
+
+var originLat = parseFloat(params.get('origin_lat'));
+var originLng = parseFloat(params.get('origin_lng'));
+
+if (!Number.isFinite(originLat) || !Number.isFinite(originLng)) {
+    originLat = defaultOriginLat;
+    originLng = defaultOriginLng;
+}
+
+var coordinates = document.getElementById('destinationCoordinates');
+var originCoordinates = document.getElementById('originCoordinates');
 var statusBox = document.getElementById('status');
 
 var validDestination =
@@ -187,7 +211,17 @@ var validDestination =
     lng <= 180 &&
     !(lat === 0 && lng === 0);
 
-if (validDestination) {
+var validOrigin =
+    Number.isFinite(originLat) &&
+    Number.isFinite(originLng) &&
+    originLat >= -90 &&
+    originLat <= 90 &&
+    originLng >= -180 &&
+    originLng <= 180;
+
+originCoordinates.textContent = originLat + ' , ' + originLng;
+
+if (validDestination && validOrigin) {
 
     coordinates.textContent = lat + ' , ' + lng;
 
@@ -205,35 +239,67 @@ if (validDestination) {
 }
 
 
-/* مسیریابی با نشان */
+/* لینک نمایش نقطه مقصد در نسخه وب نشان */
+
+function getNeshanWebUrl() {
+
+    return 'https://neshan.org/maps/share/' + lat + ',' + lng;
+
+}
+
+
+/* مسیریابی با اپلیکیشن نشان */
 
 function openNeshan() {
 
-    if (!validDestination) return;
-
-    statusBox.textContent =
-        'در حال ارسال مقصد به نشان...';
-
-    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (!validDestination || !validOrigin) return;
 
     var destination = lat + ',' + lng;
+    var origin = originLat + ',' + originLng;
 
-    var url;
+    var isAndroid = /Android/i.test(navigator.userAgent);
+    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    if (isIOS) {
+    statusBox.textContent =
+        'در حال ارسال مبدأ و مقصد به نشان...';
 
-        url = 'neshan://?destination=' +
+    if (isAndroid) {
+
+        var fallbackUrl = getNeshanWebUrl();
+
+        var intentUrl =
+            'intent://nshn.ir/?origin=' +
+            encodeURIComponent(origin) +
+            '&destination=' +
+            encodeURIComponent(destination) +
+            '&type=drive' +
+            '#Intent;' +
+            'scheme=https;' +
+            'package=org.rajman.neshan.traffic.tehran.navigator;' +
+            'S.browser_fallback_url=' +
+            encodeURIComponent(fallbackUrl) +
+            ';end';
+
+        window.location.href = intentUrl;
+
+    } else if (isIOS) {
+
+        var iosUrl =
+            'neshan://?origin=' +
+            encodeURIComponent(origin) +
+            '&destination=' +
             encodeURIComponent(destination);
+
+        window.location.href = iosUrl;
 
     } else {
 
-        url = 'https://nshn.ir/maps?destination=' +
-            encodeURIComponent(destination) +
-            '&type=drive';
+        window.open(getNeshanWebUrl(), '_blank');
+
+        statusBox.textContent =
+            'نقطه مقصد در نسخه وب نشان باز شد.';
 
     }
-
-    window.location.href = url;
 
 }
 
@@ -242,10 +308,12 @@ function openNeshan() {
 
 function openGoogle() {
 
-    if (!validDestination) return;
+    if (!validDestination || !validOrigin) return;
 
     var url =
         'https://www.google.com/maps/dir/?api=1' +
+        '&origin=' +
+        encodeURIComponent(originLat + ',' + originLng) +
         '&destination=' +
         encodeURIComponent(lat + ',' + lng) +
         '&travelmode=driving';
@@ -255,7 +323,7 @@ function openGoogle() {
 }
 
 
-/* کپی مختصات */
+/* کپی مختصات مقصد */
 
 function copyCoordinates() {
 
@@ -267,15 +335,10 @@ function copyCoordinates() {
 
         navigator.clipboard.writeText(value)
             .then(function() {
-
-                statusBox.textContent =
-                    'مختصات مقصد کپی شد.';
-
+                statusBox.textContent = 'مختصات مقصد کپی شد.';
             })
             .catch(function() {
-
                 fallbackCopy(value);
-
             });
 
     } else {
@@ -296,7 +359,6 @@ function fallbackCopy(value) {
     input.style.opacity = '0';
 
     document.body.appendChild(input);
-
     input.select();
 
     var success = false;
@@ -310,14 +372,9 @@ function fallbackCopy(value) {
     document.body.removeChild(input);
 
     if (success) {
-
         statusBox.textContent = 'مختصات مقصد کپی شد.';
-
     } else {
-
-        statusBox.textContent =
-            'مختصات مقصد: ' + value;
-
+        statusBox.textContent = 'مختصات مقصد: ' + value;
     }
 
 }
@@ -334,7 +391,7 @@ function openBalad() {
     function goToBalad() {
 
         statusBox.textContent =
-            'مختصات مقصد کپی شد.';
+            'مختصات مقصد کپی شد. آن را در بلد وارد کنید.';
 
         window.location.href = 'https://balad.ir/';
 
@@ -345,10 +402,8 @@ function openBalad() {
         navigator.clipboard.writeText(value)
             .then(goToBalad)
             .catch(function() {
-
                 fallbackCopy(value);
                 goToBalad();
-
             });
 
     } else {

@@ -68,7 +68,7 @@ body {
     margin-top: 8px;
 }
 
-button {
+.action {
     display: block;
     width: 100%;
     border: 0;
@@ -78,6 +78,8 @@ button {
     font-family: inherit;
     font-size: 15px;
     font-weight: bold;
+    text-align: center;
+    text-decoration: none;
     cursor: pointer;
 }
 
@@ -96,13 +98,13 @@ button {
     color: white;
 }
 
-button:active {
-    transform: scale(0.98);
+.action:active {
+    opacity: 0.85;
 }
 
-button:disabled {
+.action.disabled {
     opacity: 0.45;
-    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .footer {
@@ -168,17 +170,30 @@ button:disabled {
         <div class="debug" id="debugInfo"></div>
     </div>
 
-    <button class="neshan" id="neshanButton" onclick="openNeshan()">
+    <!-- لینک واقعی نشان، نه پنجره جاوااسکریپتی -->
+    <a
+        class="action neshan disabled"
+        id="neshanButton"
+        href="#"
+    >
         مسیریابی با نشان
-    </button>
+    </a>
 
-    <button class="balad" id="baladButton" onclick="openBalad()">
+    <a
+        class="action balad disabled"
+        id="baladButton"
+        href="#"
+    >
         نمایش مقصد در بلد
-    </button>
+    </a>
 
-    <button class="google" id="googleButton" onclick="openGoogle()">
+    <a
+        class="action google disabled"
+        id="googleButton"
+        href="#"
+    >
         مسیریابی با گوگل‌مپ
-    </button>
+    </a>
 
     <div class="footer">
         انتشارات ماهی · ناشر کتاب‌های خوب
@@ -188,7 +203,7 @@ button:disabled {
 
 <script>
 
-/* مختصات ثابت دفتر انتشارات ماهی */
+/* مختصات ثابت دفتر نشر ماهی */
 
 var ORIGIN_LAT = 35.70129294788876;
 var ORIGIN_LNG = 51.398984197047696;
@@ -220,55 +235,39 @@ function normalizeDigits(value) {
 }
 
 
-/* خواندن پارامترها از آدرس */
+/* خواندن پارامترهای آدرس */
 
 function getPageParams() {
 
-    var result = new URLSearchParams(window.location.search);
+    var params = new URLSearchParams(
+        window.location.search
+    );
 
-    /* بعضی لینک‌ها پارامتر را داخل بخش hash قرار می‌دهند */
-
-    var hash = window.location.hash;
-
-    if (hash.indexOf('?') !== -1) {
-        hash = hash.substring(hash.indexOf('?') + 1);
-    } else {
-        hash = hash.replace(/^#/, '');
-    }
-
-    var hashParams = new URLSearchParams(hash);
-
-    hashParams.forEach(function(value, key) {
-
-        if (!result.has(key)) {
-            result.set(key, value);
-        }
-
-    });
-
-    return result;
+    return params;
 }
 
 
-/* دریافت اولین پارامتر موجود از چند نام احتمالی */
+/* دریافت پارامتر با چند نام احتمالی */
 
 function getFirstParam(params, names) {
 
-    for (var i = 0; i < names.length; i++) {
+    var i;
+    var value;
 
-        var value = params.get(names[i]);
+    for (i = 0; i < names.length; i++) {
+
+        value = params.get(names[i]);
 
         if (value !== null && value !== '') {
             return value;
         }
-
     }
 
     return null;
 }
 
 
-/* تبدیل مختصات به عدد معتبر */
+/* تبدیل مختصات به عدد */
 
 function parseCoordinate(value) {
 
@@ -277,13 +276,27 @@ function parseCoordinate(value) {
     }
 
     value = normalizeDigits(value);
-    value = value.replace(/,/g, '.').trim();
+    value = value.trim();
+    value = value.replace(/,/g, '.');
 
     return Number(value);
 }
 
 
-/* دریافت مختصات مقصد */
+/* بررسی اعتبار مختصات */
+
+function validCoordinates(latitude, longitude) {
+
+    return isFinite(latitude) &&
+           isFinite(longitude) &&
+           latitude >= -90 &&
+           latitude <= 90 &&
+           longitude >= -180 &&
+           longitude <= 180;
+}
+
+
+/* خواندن مقصد از QR */
 
 var params = getPageParams();
 
@@ -305,115 +318,81 @@ var lngValue = getFirstParam(params, [
 var lat = parseCoordinate(latValue);
 var lng = parseCoordinate(lngValue);
 
-
-/* بررسی مختصات */
-
-function validCoordinates(latitude, longitude) {
-
-    return isFinite(latitude) &&
-           isFinite(longitude) &&
-           latitude >= -90 &&
-           latitude <= 90 &&
-           longitude >= -180 &&
-           longitude <= 180;
-}
-
 var destinationIsValid = validCoordinates(lat, lng);
 
 
-/* نمایش وضعیت مختصات */
+/* ساخت لینک دقیق نشان */
 
-if (destinationIsValid) {
-
-    document.getElementById('destinationCoordinates').innerHTML =
-        lat + ' , ' + lng;
-
-} else {
-
-    document.getElementById('errorBox').style.display = 'block';
-
-    document.getElementById('destinationCoordinates').innerHTML =
-        'مختصات مقصد نامعتبر است';
-
-    document.getElementById('debugInfo').textContent =
-        'Page URL: ' + window.location.href;
-
-    document.getElementById('neshanButton').disabled = true;
-    document.getElementById('baladButton').disabled = true;
-    document.getElementById('googleButton').disabled = true;
-}
-
-
-/* مسیریابی با نشان */
 function openNeshan(targetLat, targetLng) {
 
-    // تبدیل مختصات به عدد
     targetLat = Number(targetLat);
     targetLng = Number(targetLng);
 
-    // بررسی اعتبار مختصات
-    if (
-        !Number.isFinite(targetLat) ||
-        !Number.isFinite(targetLng) ||
-        targetLat < -90 || targetLat > 90 ||
-        targetLng < -180 || targetLng > 180
-    ) {
-        alert('مختصات مقصد معتبر نیست.');
-        return;
+    if (!validCoordinates(targetLat, targetLng)) {
+        return null;
     }
 
-    // مبدأ ثابت دفتر نشر ماهی
-    var originLat = 35.70129294788876;
-    var originLng = 51.398984197047696;
-
-    // ساخت دقیق لینک تأییدشده نشان
-    var url = 'https://nshn.ir/?origin=' +
-        originLat + ',' + originLng +
+    var url =
+        'https://nshn.ir/?origin=' +
+        ORIGIN_LAT + ',' + ORIGIN_LNG +
         '&destination=' +
         targetLat.toFixed(8) + ',' +
         targetLng.toFixed(8);
 
-    // انتقال مستقیم به لینک
-    window.location.href = url;
+    return url;
 }
-/* نمایش مقصد در بلد */
 
-function openBalad() {
 
-    if (!destinationIsValid) {
-        alert('مختصات مقصد معتبر نیست.');
-        return;
-    }
+/* نمایش مختصات و آماده‌سازی لینک‌ها */
 
-    var url =
+if (destinationIsValid) {
+
+    document.getElementById('destinationCoordinates').textContent =
+        lat.toFixed(8) + ' , ' + lng.toFixed(8);
+
+    /* نشان */
+
+    document.getElementById('neshanButton').href =
+        openNeshan(lat, lng);
+
+    document.getElementById('neshanButton').className =
+        'action neshan';
+
+
+    /* بلد */
+
+    document.getElementById('baladButton').href =
         'https://balad.ir/location?latitude=' +
-        encodeURIComponent(lat) +
+        lat +
         '&longitude=' +
-        encodeURIComponent(lng);
+        lng;
 
-    window.location.href = url;
-}
+    document.getElementById('baladButton').className =
+        'action balad';
 
 
-/* مسیریابی با گوگل‌مپ */
+    /* گوگل‌مپ */
 
-function openGoogle() {
-
-    if (!destinationIsValid) {
-        alert('مختصات مقصد معتبر نیست.');
-        return;
-    }
-
-    var origin = ORIGIN_LAT + ',' + ORIGIN_LNG;
-    var destination = lat + ',' + lng;
-
-    var url =
+    document.getElementById('googleButton').href =
         'https://www.google.com/maps/dir/?api=1' +
-        '&origin=' + encodeURIComponent(origin) +
-        '&destination=' + encodeURIComponent(destination) +
+        '&origin=' + ORIGIN_LAT + ',' + ORIGIN_LNG +
+        '&destination=' + lat + ',' + lng +
         '&travelmode=driving';
 
-    window.location.href = url;
+    document.getElementById('googleButton').className =
+        'action google';
+
+} else {
+
+    document.getElementById('errorBox').style.display =
+        'block';
+
+    document.getElementById('destinationCoordinates').textContent =
+        'مختصات مقصد نامعتبر است';
+
+    document.getElementById('debugInfo').textContent =
+        'URL: ' + window.location.href;
+
 }
 
 </script>

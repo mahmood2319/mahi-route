@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مسیریابی مرسولات — نشر ماهی</title>
-    
+
     <style>
         :root {
             --primary: #9e3d24;
@@ -43,7 +44,8 @@
             background: var(--card-bg);
             border-radius: 20px;
             padding: 28px 22px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05),
+                        0 8px 10px -6px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
@@ -107,6 +109,7 @@
             font-size: 12px;
             direction: ltr;
             color: #475569;
+            gap: 8px;
         }
 
         .copy-btn {
@@ -117,7 +120,7 @@
             font-size: 11px;
             cursor: pointer;
             font-family: inherit;
-            transition: all 0.2s;
+            flex-shrink: 0;
         }
 
         .copy-btn:active {
@@ -142,7 +145,7 @@
             text-decoration: none;
             font-size: 14.5px;
             font-weight: 600;
-            transition: transform 0.15s ease, opacity 0.2s ease, filter 0.2s ease;
+            transition: transform 0.15s ease, opacity 0.2s ease;
             user-select: none;
         }
 
@@ -151,9 +154,17 @@
             filter: brightness(0.92);
         }
 
-        .btn-neshan { background-color: var(--neshan-color); }
-        .btn-balad  { background-color: var(--balad-color); }
-        .btn-google { background-color: var(--google-color); }
+        .btn-neshan {
+            background-color: var(--neshan-color);
+        }
+
+        .btn-balad {
+            background-color: var(--balad-color);
+        }
+
+        .btn-google {
+            background-color: var(--google-color);
+        }
 
         .error-card {
             display: none;
@@ -185,9 +196,11 @@
         }
     </style>
 </head>
+
 <body>
 
 <main class="card">
+
     <header class="header">
         <h1 class="logo">انتشارات ماهی</h1>
         <p class="subtitle">هدایت به مسیریاب جهت تحویل مرسوله</p>
@@ -195,156 +208,215 @@
 
     <div id="errorState" class="error-card">
         <strong>مختصات مقصد یافت نشد یا نامعتبر است!</strong>
-        <span>لطفاً از صحت کیو‌آرکد یا لینک اطمینان حاصل فرمایید.</span>
+        <span>لطفاً از صحت کیوآرکد یا لینک اطمینان حاصل فرمایید.</span>
         <code id="debugUrl"></code>
     </div>
 
     <section class="info-box" id="infoBox">
+
         <div class="info-row">
             <span class="label">مبدأ حرکت:</span>
             <span class="value">دفتر مرکزی نشر ماهی</span>
         </div>
+
         <div class="info-row">
             <span class="label">مقصد تحویل:</span>
             <span class="value">آدرس گیرنده</span>
         </div>
+
         <div class="coord-box">
             <span id="coordsDisplay">در حال خواندن مختصات...</span>
             <button type="button" class="copy-btn" id="copyBtn">کپی</button>
         </div>
+
     </section>
 
     <nav class="actions-group" id="actionLinks">
-        <a id="neshanBtn" class="nav-btn btn-neshan" target="_blank" rel="noopener noreferrer">
+
+        <a id="neshanBtn" class="nav-btn btn-neshan"
+           target="_blank" rel="noopener noreferrer">
             مسیریابی با نشان
         </a>
-        <a id="baladBtn" class="nav-btn btn-balad" target="_blank" rel="noopener noreferrer">
+
+        <a id="baladBtn" class="nav-btn btn-balad"
+           target="_blank" rel="noopener noreferrer">
             مسیریابی با بلد
         </a>
-        <a id="googleBtn" class="nav-btn btn-google" target="_blank" rel="noopener noreferrer">
+
+        <a id="googleBtn" class="nav-btn btn-google"
+           target="_blank" rel="noopener noreferrer">
             مسیریابی با گوگل مپ
         </a>
+
     </nav>
 
     <footer class="footer">
         انتشارات ماهی · ناشر کتاب‌های خوب
     </footer>
+
 </main>
 
 <script>
-    // مختصات دفتر مرکزی نشر ماهی
-    const ORIGIN = {
-        lat: 35.70129295,
-        lng: 51.39898420
-    };
+(function () {
 
-    /**
-     * تبدیل اعداد فارسی و عربی به ارقام استاندارد انگلیسی
-     */
-    function normalizeDigits(str) {
-        if (!str) return '';
-        return String(str)
-            .replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d))
-            .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
-            .replace(/,/g, '.')
+    // مختصات دقیق و ثابت دفتر مرکزی نشر ماهی
+    var ORIGIN_LAT = 35.70129294788876;
+    var ORIGIN_LNG = 51.398984197047696;
+
+    // تبدیل اعداد فارسی و عربی به انگلیسی
+    function normalizeDigits(value) {
+
+        return String(value || '')
+            .replace(/[۰-۹]/g, function (digit) {
+                return '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit);
+            })
+            .replace(/[٠-٩]/g, function (digit) {
+                return '٠١٢٣٤٥٦٧٨٩'.indexOf(digit);
+            })
             .trim();
     }
 
-    /**
-     * اعتبارسنجی مختصات جغرافیایی
-     */
+    // بررسی معتبر بودن مختصات
     function isValidCoordinate(lat, lng) {
-        return Number.isFinite(lat) &&
-               Number.isFinite(lng) &&
-               lat >= -90 && lat <= 90 &&
-               lng >= -180 && lng <= 180;
+
+        return isFinite(lat) &&
+               isFinite(lng) &&
+               lat >= -90 &&
+               lat <= 90 &&
+               lng >= -180 &&
+               lng <= 180 &&
+               !(lat === 0 && lng === 0);
     }
 
-    /**
-     * استخراج مختصات مقصد از پارامترهای آدرس بار
-     */
+    // خواندن مقصد از آدرس صفحه
     function extractDestination() {
-        const params = new URLSearchParams(window.location.search);
 
-        // ۱. بررسی حالتی که lat و lng جداگانه آمده‌اند
-        const latKeys = ['lat', 'latitude', 'dest_lat', 'destination_lat'];
-        const lngKeys = ['lng', 'lon', 'longitude', 'dest_lng', 'destination_lng'];
+        var params = new URLSearchParams(window.location.search);
 
-        let rawLat = null;
-        let rawLng = null;
+        var rawLat =
+            params.get('lat') ||
+            params.get('latitude') ||
+            params.get('dest_lat') ||
+            params.get('destination_lat');
 
-        for (const key of latKeys) {
-            if (params.has(key)) { rawLat = params.get(key); break; }
-        }
-        for (const key of lngKeys) {
-            if (params.has(key)) { rawLng = params.get(key); break; }
-        }
+        var rawLng =
+            params.get('lng') ||
+            params.get('lon') ||
+            params.get('longitude') ||
+            params.get('dest_lng') ||
+            params.get('destination_lng');
 
-        if (rawLat && rawLng) {
-            const lat = Number(normalizeDigits(rawLat));
-            const lng = Number(normalizeDigits(rawLng));
-            if (isValidCoordinate(lat, lng)) return { lat, lng };
+        if (!rawLat || !rawLng) {
+            return null;
         }
 
-        // ۲. بررسی حالتی که مختصات یکجا با کاما فرستاده شده‌اند: ?q=35.7,51.3 یا ?dest=...
-        const combinedKeys = ['q', 'loc', 'dest', 'destination', 'point'];
-        for (const key of combinedKeys) {
-            if (params.has(key)) {
-                const parts = normalizeDigits(params.get(key)).split(',');
-                if (parts.length === 2) {
-                    const lat = Number(parts[0]);
-                    const lng = Number(parts[1]);
-                    if (isValidCoordinate(lat, lng)) return { lat, lng };
-                }
-            }
+        var lat = Number(
+            normalizeDigits(rawLat).replace(/,/g, '.')
+        );
+
+        var lng = Number(
+            normalizeDigits(rawLng).replace(/,/g, '.')
+        );
+
+        if (!isValidCoordinate(lat, lng)) {
+            return null;
         }
 
-        return null;
+        return {
+            lat: lat,
+            lng: lng
+        };
     }
 
-    // مقداردهی و اتصال لینک‌ها
-    (function init() {
-        const dest = extractDestination();
-        const errorState = document.getElementById('errorState');
-        const actionLinks = document.getElementById('actionLinks');
-        const coordsDisplay = document.getElementById('coordsDisplay');
-        const copyBtn = document.getElementById('copyBtn');
+    // استخراج مختصات مقصد
+    var destination = extractDestination();
 
-        if (!dest) {
-            errorState.style.display = 'block';
-            actionLinks.style.display = 'none';
-            coordsDisplay.textContent = 'نامعتبر';
-            document.getElementById('debugUrl').textContent = window.location.href;
-            copyBtn.style.display = 'none';
-            return;
-        }
+    var errorState = document.getElementById('errorState');
+    var actionLinks = document.getElementById('actionLinks');
+    var coordsDisplay = document.getElementById('coordsDisplay');
+    var copyBtn = document.getElementById('copyBtn');
 
-        const formattedLat = dest.lat.toFixed(6);
-        const formattedLng = dest.lng.toFixed(6);
-        const coordString = `${formattedLat}, ${formattedLng}`;
+    // اگر مقصد پیدا نشد
+    if (!destination) {
 
-        coordsDisplay.textContent = coordString;
+        errorState.style.display = 'block';
+        actionLinks.style.display = 'none';
+        coordsDisplay.textContent = 'مختصات نامعتبر است';
+        copyBtn.style.display = 'none';
 
-        // کپی مختصات در کلیپ‌بورد با لمس دکمه
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(`${dest.lat},${dest.lng}`).then(() => {
+        document.getElementById('debugUrl').textContent =
+            window.location.href;
+
+        return;
+    }
+
+    // نمایش مختصات مقصد
+    coordsDisplay.textContent =
+        destination.lat.toFixed(7) + ', ' +
+        destination.lng.toFixed(7);
+
+    // ساخت رشته مبدأ و مقصد
+    var origin =
+        ORIGIN_LAT + ',' + ORIGIN_LNG;
+
+    var dest =
+        destination.lat + ',' + destination.lng;
+
+    // ساخت لینک نشان با قالب آزمایش‌شده
+    var neshanUrl =
+        'https://nshn.ir/?origin=' +
+        origin +
+        '&destination=' +
+        dest;
+
+    document.getElementById('neshanBtn').href = neshanUrl;
+
+    // ساخت لینک بلد
+    var baladUrl =
+        'https://balad.ir/directions?origin=' +
+        origin +
+        '&destination=' +
+        dest;
+
+    document.getElementById('baladBtn').href = baladUrl;
+
+    // ساخت لینک گوگل مپ
+    var googleUrl =
+        'https://www.google.com/maps/dir/?api=1&origin=' +
+        origin +
+        '&destination=' +
+        dest +
+        '&travelmode=driving';
+
+    document.getElementById('googleBtn').href = googleUrl;
+
+    // کپی مختصات مقصد
+    copyBtn.addEventListener('click', function () {
+
+        var text = destination.lat + ',' + destination.lng;
+
+        if (navigator.clipboard &&
+            navigator.clipboard.writeText) {
+
+            navigator.clipboard.writeText(text).then(function () {
+
                 copyBtn.textContent = 'کپی شد!';
-                setTimeout(() => copyBtn.textContent = 'کپی', 1800);
+
+                setTimeout(function () {
+                    copyBtn.textContent = 'کپی';
+                }, 1800);
+
+            }).catch(function () {
+                alert('کپی خودکار انجام نشد. مختصات: ' + text);
             });
-        });
 
-        // ۱. لینک نشان (رسم مسیر از مبدأ به مقصد)
-        document.getElementById('neshanBtn').href = 
-            `https://nshn.ir/?origin=${ORIGIN.lat},${ORIGIN.lng}&destination=${dest.lat},${dest.lng}`;
+        } else {
 
-        // ۲. لینک بلد (مسیریابی بین دو نقطه)
-        document.getElementById('baladBtn').href = 
-            `https://balad.ir/directions?origin=${ORIGIN.lat},${ORIGIN.lng}&destination=${dest.lat},${dest.lng}`;
+            alert('مختصات مقصد: ' + text);
+        }
+    });
 
-        // ۳. لینک گوگل مپ (حالت Driving مستقیم)
-        document.getElementById('googleBtn').href = 
-            `https://www.google.com/maps/dir/?api=1&origin=${ORIGIN.lat},${ORIGIN.lng}&destination=${dest.lat},${dest.lng}&travelmode=driving`;
-    })();
+})();
 </script>
 
 </body>

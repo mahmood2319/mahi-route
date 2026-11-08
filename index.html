@@ -33,13 +33,6 @@ body {
     text-align: center;
 }
 
-.logo {
-    width: 85px;
-    height: 85px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
 h1 {
     font-size: 21px;
     margin: 8px 0;
@@ -94,6 +87,13 @@ button {
     font-family: inherit;
 }
 
+.browser {
+    background: #263b50;
+    color: white;
+    border: 2px solid #d6a84b;
+    margin-bottom: 12px;
+}
+
 .neshan {
     background: #e65335;
     color: white;
@@ -134,37 +134,34 @@ button:active {
 <div class="container">
     <div class="card">
 
-        <img
-            class="logo"
-            src="https://mahmood2319.github.io/mahi-route/logo.png"
-            alt="نشر ماهی"
-            onerror="this.style.display='none'"
-        >
-
         <h1>مسیریابی نشر ماهی</h1>
 
         <div class="subtitle">
-            برای مشاهده مسیر و حرکت به سمت مقصد، یکی از نقشه‌ها را انتخاب کنید.
+            مقصد تحویل مرسوله را انتخاب کنید و مسیر را مشاهده کنید.
         </div>
 
         <div class="location">
             <div class="location-title">مبدأ حرکت؛ دفتر نشر ماهی</div>
-            <div class="coordinates" id="originCoordinates">در حال بارگذاری...</div>
+            <div class="coordinates" id="originCoordinates"></div>
         </div>
 
         <div class="location">
             <div class="location-title">مقصد تحویل مرسوله</div>
-            <div class="coordinates" id="destinationCoordinates">در حال بارگذاری...</div>
+            <div class="coordinates" id="destinationCoordinates"></div>
         </div>
 
         <div class="buttons">
+
+            <button class="browser" onclick="openChrome()">
+                باز کردن صفحه در مرورگر اصلی گوشی
+            </button>
 
             <button class="neshan" onclick="openNeshan()">
                 مسیریابی با نشان
             </button>
 
             <button class="balad" onclick="openBalad()">
-                مشاهده مقصد در بلد
+                مسیریابی با بلد
             </button>
 
             <button class="google" onclick="openGoogle()">
@@ -174,7 +171,7 @@ button:active {
         </div>
 
         <div class="status" id="status">
-            اطلاعات مقصد از کد QR دریافت شد.
+            اطلاعات مقصد دریافت شد.
         </div>
 
         <div class="footer">
@@ -185,11 +182,14 @@ button:active {
 </div>
 
 <script>
-/* مختصات ثابت دفتر نشر ماهی */
+
+/* مختصات دفتر نشر ماهی */
+
 var defaultOriginLat = 35.70129294788876;
 var defaultOriginLng = 51.398984197047696;
 
-/* دریافت مختصات از QR */
+/* دریافت مختصات QR */
+
 var params = new URLSearchParams(window.location.search);
 
 var lat = parseFloat(params.get('lat'));
@@ -198,7 +198,6 @@ var lng = parseFloat(params.get('lng'));
 var originLat = parseFloat(params.get('origin_lat'));
 var originLng = parseFloat(params.get('origin_lng'));
 
-/* اگر مبدأ در QR وجود نداشت، از مبدأ ثابت استفاده شود */
 if (!isFinite(originLat) || !isFinite(originLng)) {
     originLat = defaultOriginLat;
     originLng = defaultOriginLng;
@@ -221,18 +220,55 @@ var validOrigin =
     originLng <= 180;
 
 /* نمایش مختصات */
+
 document.getElementById('originCoordinates').textContent =
     originLat + ', ' + originLng;
 
 if (validDestination) {
+
     document.getElementById('destinationCoordinates').textContent =
         lat + ', ' + lng;
+
 } else {
+
     document.getElementById('destinationCoordinates').textContent =
         'مختصات مقصد معتبر نیست';
 
     document.getElementById('status').textContent =
-        'خطا: اطلاعات مقصد در کد QR وجود ندارد.';
+        'خطا: اطلاعات مقصد در QR وجود ندارد.';
+
+}
+
+/* وضعیت صفحه */
+
+function showStatus(message) {
+    document.getElementById('status').textContent = message;
+}
+
+/* باز کردن صفحه در Chrome اندروید */
+
+function openChrome() {
+
+    var currentUrl = window.location.href;
+
+    if (!/^https?:\/\//i.test(currentUrl)) {
+        showStatus('آدرس صفحه معتبر نیست.');
+        return;
+    }
+
+    var chromeUrl =
+        'intent://' +
+        currentUrl.replace(/^https?:\/\//i, '') +
+        '#Intent;' +
+        'scheme=https;' +
+        'package=com.android.chrome;' +
+        'S.browser_fallback_url=' +
+        encodeURIComponent(currentUrl) +
+        ';end';
+
+    showStatus('در حال تلاش برای باز کردن Chrome...');
+
+    window.location.href = chromeUrl;
 }
 
 /* مسیریابی با نشان */
@@ -240,8 +276,7 @@ if (validDestination) {
 function openNeshan() {
 
     if (!validDestination || !validOrigin) {
-        document.getElementById('status').textContent =
-            'مختصات مبدأ یا مقصد معتبر نیست.';
+        showStatus('مختصات مبدأ یا مقصد معتبر نیست.');
         return;
     }
 
@@ -254,23 +289,19 @@ function openNeshan() {
         '&destination=' +
         encodeURIComponent(destination);
 
-    document.getElementById('status').textContent =
-        'در حال انتقال به نشان...';
+    showStatus('در حال باز کردن نشان...');
 
     window.location.href = url;
 }
 
+/* مسیریابی با بلد */
 
-/* مشاهده مقصد در بلد */
 function openBalad() {
 
     if (!validDestination) {
-        document.getElementById('status').textContent =
-            'مختصات مقصد معتبر نیست.';
+        showStatus('مختصات مقصد معتبر نیست.');
         return;
     }
-
-    var destination = lat + ',' + lng;
 
     var url =
         'https://balad.ir/location?latitude=' +
@@ -278,18 +309,17 @@ function openBalad() {
         '&longitude=' +
         encodeURIComponent(lng);
 
-    window.open(url, '_blank');
+    showStatus('در حال باز کردن مقصد در بلد...');
 
-    document.getElementById('status').textContent =
-        'در حال باز کردن مقصد در بلد...';
+    window.location.href = url;
 }
 
 /* مسیریابی با گوگل‌مپ */
+
 function openGoogle() {
 
     if (!validDestination || !validOrigin) {
-        document.getElementById('status').textContent =
-            'مختصات مبدأ یا مقصد معتبر نیست.';
+        showStatus('مختصات مبدأ یا مقصد معتبر نیست.');
         return;
     }
 
@@ -302,11 +332,11 @@ function openGoogle() {
         '&destination=' + encodeURIComponent(destination) +
         '&travelmode=driving';
 
-    window.open(url, '_blank');
+    showStatus('در حال باز کردن گوگل‌مپ...');
 
-    document.getElementById('status').textContent =
-        'مسیر مبدأ تا مقصد در گوگل‌مپ باز شد.';
+    window.location.href = url;
 }
+
 </script>
 
 </body>

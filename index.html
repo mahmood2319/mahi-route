@@ -345,13 +345,23 @@ if (destinationIsValid) {
 
 
 /* مسیریابی با نشان */
-function openNeshan() {
+function openNeshan(targetLat, targetLng) {
+    // بررسی اعتبار مختصات
+    if (typeof targetLat !== 'number' || typeof targetLng !== 'number') {
+        alert('مختصات مقصد معتبر نیست.');
+        return;
+    }
 
-    var url = 'https://nshn.ir/?origin=35.70129294788876,51.398984197047696&destination=35.700000,51.400000';
+    // مبدأ ثابت (مثلاً میدان انقلاب)
+    const originLat = 35.70129294788876;
+    const originLng = 51.398984197047696;
 
-    window.location.href = url;
+    // استفاده از Template Literals برای خوانایی بهتر
+    const url = `https://nshn.ir/?origin=${originLat},${originLng}&destination=${targetLat.toFixed(8)},${targetLng.toFixed(8)}`;
 
+    window.open(url, '_blank');
 }
+
 /* نمایش مقصد در بلد */
 
 function openBalad() {

@@ -347,15 +347,10 @@ if (destinationIsValid) {
 /* مسیریابی با نشان */
 function openNeshan() {
 
-    if (!destinationIsValid) {
-        alert('مختصات مقصد معتبر نیست.');
-        return;
-    }
+    var url = 'https://nshn.ir/?origin=35.70129294788876,51.398984197047696&destination=35.700000,51.400000';
 
-    var url = 'https://nshn.ir/?origin=35.70129294788876,51.398984197047696&destination='
-        + lat.toFixed(8) + ',' + lng.toFixed(8);
+    window.location.href = url;
 
-    window.open(url, '_blank');
 }
 /* نمایش مقصد در بلد */
 

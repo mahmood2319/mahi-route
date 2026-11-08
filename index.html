@@ -346,22 +346,36 @@ if (destinationIsValid) {
 
 /* مسیریابی با نشان */
 function openNeshan(targetLat, targetLng) {
+
+    // تبدیل مختصات به عدد
+    targetLat = Number(targetLat);
+    targetLng = Number(targetLng);
+
     // بررسی اعتبار مختصات
-    if (typeof targetLat !== 'number' || typeof targetLng !== 'number') {
+    if (
+        !Number.isFinite(targetLat) ||
+        !Number.isFinite(targetLng) ||
+        targetLat < -90 || targetLat > 90 ||
+        targetLng < -180 || targetLng > 180
+    ) {
         alert('مختصات مقصد معتبر نیست.');
         return;
     }
 
-    // مبدأ ثابت (مثلاً میدان انقلاب)
-    const originLat = 35.70129294788876;
-    const originLng = 51.398984197047696;
+    // مبدأ ثابت دفتر نشر ماهی
+    var originLat = 35.70129294788876;
+    var originLng = 51.398984197047696;
 
-    // استفاده از Template Literals برای خوانایی بهتر
-    const url = `https://nshn.ir/?origin=${originLat},${originLng}&destination=${targetLat.toFixed(8)},${targetLng.toFixed(8)}`;
+    // ساخت دقیق لینک تأییدشده نشان
+    var url = 'https://nshn.ir/?origin=' +
+        originLat + ',' + originLng +
+        '&destination=' +
+        targetLat.toFixed(8) + ',' +
+        targetLng.toFixed(8);
 
-    window.open(url, '_blank');
+    // انتقال مستقیم به لینک
+    window.location.href = url;
 }
-
 /* نمایش مقصد در بلد */
 
 function openBalad() {

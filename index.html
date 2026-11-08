@@ -354,15 +354,13 @@ function openNeshan() {
         return;
     }
 
-    var url =
-        'https://nshn.ir/?origin=' +
-        '35.70129294788876,51.398984197047696' +
+    var url = 'https://nshn.ir/?origin=' +
+        ORIGIN_LAT + ',' + ORIGIN_LNG +
         '&destination=' +
         lat + ',' + lng;
 
-    alert(url);
+    window.location.assign(url);
 }
-
 /* نمایش مقصد در بلد */
 
 function openBalad() {

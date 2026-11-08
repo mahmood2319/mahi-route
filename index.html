@@ -1,206 +1,4 @@
 
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>مسیریابی نشر ماهی</title>
-
-<style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    padding: 22px 15px;
-    background: #f2f4f7;
-    color: #1e293b;
-    font-family: Tahoma, Arial, sans-serif;
-}
-
-.container {
-    width: 100%;
-    max-width: 430px;
-    margin: 20px auto;
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 25px 20px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-}
-
-.logo {
-    text-align: center;
-    color: #a34c32;
-    font-size: 23px;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.subtitle {
-    text-align: center;
-    color: #64748b;
-    font-size: 13px;
-    margin-bottom: 25px;
-}
-
-.info {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 18px;
-    line-height: 2;
-    font-size: 13px;
-}
-
-.info strong {
-    color: #334155;
-}
-
-.coordinates {
-    direction: ltr;
-    text-align: left;
-    color: #64748b;
-    font-size: 12px;
-    word-break: break-all;
-}
-
-button {
-    display: block;
-    width: 100%;
-    border: 0;
-    border-radius: 11px;
-    padding: 15px 12px;
-    margin-top: 12px;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.neshan {
-    background: #b94732;
-    color: white;
-}
-
-.balad {
-    background: #16865b;
-    color: white;
-}
-
-.google {
-    background: #2563eb;
-    color: white;
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-.footer {
-    text-align: center;
-    color: #94a3b8;
-    font-size: 11px;
-    margin-top: 25px;
-}
-
-.error {
-    display: none;
-    color: #b91c1c;
-    background: #fef2f2;
-    padding: 12px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 13px;
-    line-height: 2;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-    <div class="logo">انتشارات ماهی</div>
-
-    <div class="subtitle">
-        سامانه مسیریابی مرسولات
-    </div>
-
-    <div class="info">
-        <div>
-            <strong>مبدأ:</strong>
-            دفتر انتشارات ماهی
-        </div>
-
-        <div>
-            <strong>مقصد:</strong>
-            آدرس مشتری
-        </div>
-
-        <div class="coordinates" id="destinationCoordinates">
-            در حال دریافت مختصات...
-        </div>
-    </div>
-
-    <div class="error" id="errorBox">
-        مختصات مقصد در کد QR وجود ندارد یا معتبر نیست.
-    </div>
-
-    <button class="neshan" onclick="openNeshan()">
-        مسیریابی با نشان
-    </button>
-
-    <button class="balad" onclick="openBalad()">
-        نمایش مقصد در بلد
-    </button>
-
-    <button class="google" onclick="openGoogle()">
-        مسیریابی با گوگل‌مپ
-    </button>
-
-    <div class="footer">
-        انتشارات ماهی · ناشر کتاب‌های خوب
-    </div>
-
-</div>
-
-<script>
-/* مختصات ثابت دفتر انتشارات ماهی */
-var ORIGIN_LAT = 35.70129294788876;
-var ORIGIN_LNG = 51.398984197047696;
-
-/* دریافت مختصات مقصد از QR */
-var params = new URLSearchParams(window.location.search);
-
-var lat = parseFloat(params.get('lat'));
-var lng = parseFloat(params.get('lng'));
-
-/* بررسی معتبر بودن مختصات */
-function validCoordinates(latitude, longitude) {
-    return isFinite(latitude) &&
-           isFinite(longitude) &&
-           latitude >= -90 &&
-           latitude <= 90 &&
-           longitude >= -180 &&
-           longitude <= 180;
-}
-
-var destinationIsValid = validCoordinates(lat, lng);
-
-if (destinationIsValid) {
-    document.getElementById('destinationCoordinates').innerHTML =
-        lat + ' , ' + lng;
-} else {
-    document.getElementById('errorBox').style.display = 'block';
-
-    document.getElementById('destinationCoordinates').innerHTML =
-        'مختصات نامعتبر';
-}
-
-/* مسیریابی با نشان */
 function openNeshan() {
 
     if (!destinationIsValid) {
@@ -211,53 +9,43 @@ function openNeshan() {
     var origin = ORIGIN_LAT + ',' + ORIGIN_LNG;
     var destination = lat + ',' + lng;
 
-    var url =
-        'https://nshn.ir/maps?origin=' +
+    var neshanUrl =
+        'https://nshn.ir/?origin=' +
         encodeURIComponent(origin) +
         '&destination=' +
-        encodeURIComponent(destination) +
-        '&type=drive';
+        encodeURIComponent(destination);
 
-    window.location.href = url;
-}
+    var userAgent = navigator.userAgent.toLowerCase();
 
-/* نمایش مقصد در بلد */
-function openBalad() {
+    if (userAgent.indexOf('android') !== -1) {
 
-    if (!destinationIsValid) {
-        alert('مختصات مقصد معتبر نیست.');
-        return;
+        var intentUrl =
+            'intent://nshn.ir/?origin=' +
+            encodeURIComponent(origin) +
+            '&destination=' +
+            encodeURIComponent(destination) +
+            '#Intent;' +
+            'scheme=https;' +
+            'package=org.rajman.neshan.traffic.tehran.navigator;' +
+            'S.browser_fallback_url=' +
+            encodeURIComponent(neshanUrl) +
+            ';end';
+
+        window.location.href = intentUrl;
+
+    } else if (userAgent.indexOf('iphone') !== -1 ||
+               userAgent.indexOf('ipad') !== -1) {
+
+        var iosUrl =
+            'neshan://?origin=' +
+            encodeURIComponent(origin) +
+            '&destination=' +
+            encodeURIComponent(destination);
+
+        window.location.href = iosUrl;
+
+    } else {
+
+        window.location.href = neshanUrl;
     }
-
-    var url =
-        'https://balad.ir/location?latitude=' +
-        encodeURIComponent(lat) +
-        '&longitude=' +
-        encodeURIComponent(lng);
-
-    window.location.href = url;
 }
-
-/* مسیریابی با گوگل‌مپ */
-function openGoogle() {
-
-    if (!destinationIsValid) {
-        alert('مختصات مقصد معتبر نیست.');
-        return;
-    }
-
-    var origin = ORIGIN_LAT + ',' + ORIGIN_LNG;
-    var destination = lat + ',' + lng;
-
-    var url =
-        'https://www.google.com/maps/dir/?api=1' +
-        '&origin=' + encodeURIComponent(origin) +
-        '&destination=' + encodeURIComponent(destination) +
-        '&travelmode=driving';
-
-    window.location.href = url;
-}
-</script>
-
-</body>
-</html>

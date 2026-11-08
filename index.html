@@ -262,11 +262,10 @@ h1 {
 
     document.getElementById('neshanBtn').href = neshanUrl;
 
-    // بلد ـ لینک جست‌وجوی مسیر با مبدأ و مقصد
 // بلد ـ مسیریابی مستقیم از دفتر نشر ماهی تا مقصد
 var destParts = dest.split(',');
 
-var baladOrigin = '51.3989842,35.7012929';
+var baladOrigin = '51.399609,35.700698';
 var baladDestination = destParts[1] + ',' + destParts[0];
 
 var baladUrl =
@@ -276,7 +275,6 @@ var baladUrl =
     encodeURIComponent(baladDestination);
 
 document.getElementById('baladBtn').href = baladUrl;
-
     // گوگل‌مپ
     var googleUrl =
         'https://www.google.com/maps/dir/?api=1' +

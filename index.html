@@ -1,400 +1,350 @@
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مسیریابی مرسولات — نشر ماهی</title>
+    
+    <style>
+        :root {
+            --primary: #9e3d24;
+            --primary-hover: #832e18;
+            --neshan-color: #e04622;
+            --balad-color: #0c8a5a;
+            --google-color: #1a73e8;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
 
-<title>مسیریابی نشر ماهی</title>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-<style>
-* {
-    box-sizing: border-box;
-}
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
 
-body {
-    margin: 0;
-    padding: 22px 15px;
-    background: #f2f4f7;
-    color: #1e293b;
-    font-family: Tahoma, Arial, sans-serif;
-}
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 28px 22px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
 
-.container {
-    width: 100%;
-    max-width: 430px;
-    margin: 20px auto;
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 25px 20px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-}
+        .header {
+            text-align: center;
+            margin-bottom: 22px;
+        }
 
-.logo {
-    text-align: center;
-    color: #a34c32;
-    font-size: 23px;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
 
-.subtitle {
-    text-align: center;
-    color: #64748b;
-    font-size: 13px;
-    margin-bottom: 25px;
-}
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
 
-.info {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 18px;
-    line-height: 2;
-    font-size: 13px;
-}
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            line-height: 1.8;
+        }
 
-.info strong {
-    color: #334155;
-}
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
 
-.coordinates {
-    direction: ltr;
-    text-align: left;
-    color: #64748b;
-    font-size: 12px;
-    word-break: break-all;
-    margin-top: 8px;
-}
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
 
-.action {
-    display: block;
-    width: 100%;
-    border: 0;
-    border-radius: 11px;
-    padding: 15px 12px;
-    margin-top: 12px;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-}
+        .label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
 
-.neshan {
-    background: #b94732;
-    color: white;
-}
+        .value {
+            font-weight: 600;
+            color: var(--text-main);
+        }
 
-.balad {
-    background: #16865b;
-    color: white;
-}
+        .coord-box {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: monospace;
+            font-size: 12px;
+            direction: ltr;
+            color: #475569;
+        }
 
-.google {
-    background: #2563eb;
-    color: white;
-}
+        .copy-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
 
-.action:active {
-    opacity: 0.85;
-}
+        .copy-btn:active {
+            background: #cbd5e1;
+        }
 
-.action.disabled {
-    opacity: 0.45;
-    pointer-events: none;
-}
+        .actions-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-.footer {
-    text-align: center;
-    color: #94a3b8;
-    font-size: 11px;
-    margin-top: 25px;
-}
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14.5px;
+            font-weight: 600;
+            transition: transform 0.15s ease, opacity 0.2s ease, filter 0.2s ease;
+            user-select: none;
+        }
 
-.error {
-    display: none;
-    color: #b91c1c;
-    background: #fef2f2;
-    padding: 12px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 13px;
-    line-height: 2;
-    margin-bottom: 15px;
-}
+        .nav-btn:active {
+            transform: scale(0.98);
+            filter: brightness(0.92);
+        }
 
-.debug {
-    direction: ltr;
-    text-align: left;
-    overflow-wrap: anywhere;
-    font-size: 11px;
-    color: #64748b;
-    margin-top: 8px;
-}
-</style>
+        .btn-neshan { background-color: var(--neshan-color); }
+        .btn-balad  { background-color: var(--balad-color); }
+        .btn-google { background-color: var(--google-color); }
+
+        .error-card {
+            display: none;
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            color: #991b1b;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        .error-card code {
+            display: block;
+            margin-top: 8px;
+            font-size: 11px;
+            direction: ltr;
+            color: #b91c1c;
+            word-break: break-all;
+        }
+
+        .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 11.5px;
+            color: #94a3b8;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+<main class="card">
+    <header class="header">
+        <h1 class="logo">انتشارات ماهی</h1>
+        <p class="subtitle">هدایت به مسیریاب جهت تحویل مرسوله</p>
+    </header>
 
-    <div class="logo">انتشارات ماهی</div>
-
-    <div class="subtitle">
-        سامانه مسیریابی مرسولات
+    <div id="errorState" class="error-card">
+        <strong>مختصات مقصد یافت نشد یا نامعتبر است!</strong>
+        <span>لطفاً از صحت کیو‌آرکد یا لینک اطمینان حاصل فرمایید.</span>
+        <code id="debugUrl"></code>
     </div>
 
-    <div class="info">
-
-        <div>
-            <strong>مبدأ:</strong>
-            دفتر انتشارات ماهی
+    <section class="info-box" id="infoBox">
+        <div class="info-row">
+            <span class="label">مبدأ حرکت:</span>
+            <span class="value">دفتر مرکزی نشر ماهی</span>
         </div>
-
-        <div>
-            <strong>مقصد:</strong>
-            آدرس مشتری
+        <div class="info-row">
+            <span class="label">مقصد تحویل:</span>
+            <span class="value">آدرس گیرنده</span>
         </div>
-
-        <div class="coordinates" id="destinationCoordinates">
-            در حال دریافت مختصات...
+        <div class="coord-box">
+            <span id="coordsDisplay">در حال خواندن مختصات...</span>
+            <button type="button" class="copy-btn" id="copyBtn">کپی</button>
         </div>
+    </section>
 
-    </div>
+    <nav class="actions-group" id="actionLinks">
+        <a id="neshanBtn" class="nav-btn btn-neshan" target="_blank" rel="noopener noreferrer">
+            مسیریابی با نشان
+        </a>
+        <a id="baladBtn" class="nav-btn btn-balad" target="_blank" rel="noopener noreferrer">
+            مسیریابی با بلد
+        </a>
+        <a id="googleBtn" class="nav-btn btn-google" target="_blank" rel="noopener noreferrer">
+            مسیریابی با گوگل مپ
+        </a>
+    </nav>
 
-    <div class="error" id="errorBox">
-        مختصات مقصد در لینک QR پیدا نشد.
-        <div class="debug" id="debugInfo"></div>
-    </div>
-
-    <!-- لینک واقعی نشان، نه پنجره جاوااسکریپتی -->
-    <a
-        class="action neshan disabled"
-        id="neshanButton"
-        href="#"
-    >
-        مسیریابی با نشان
-    </a>
-
-    <a
-        class="action balad disabled"
-        id="baladButton"
-        href="#"
-    >
-        نمایش مقصد در بلد
-    </a>
-
-    <a
-        class="action google disabled"
-        id="googleButton"
-        href="#"
-    >
-        مسیریابی با گوگل‌مپ
-    </a>
-
-    <div class="footer">
+    <footer class="footer">
         انتشارات ماهی · ناشر کتاب‌های خوب
-    </div>
-
-</div>
+    </footer>
+</main>
 
 <script>
+    // مختصات دفتر مرکزی نشر ماهی
+    const ORIGIN = {
+        lat: 35.70129295,
+        lng: 51.39898420
+    };
 
-/* مختصات ثابت دفتر نشر ماهی */
-
-var ORIGIN_LAT = 35.70129294788876;
-var ORIGIN_LNG = 51.398984197047696;
-
-
-/* تبدیل اعداد فارسی و عربی به انگلیسی */
-
-function normalizeDigits(value) {
-
-    var persian = '۰۱۲۳۴۵۶۷۸۹';
-    var arabic = '٠١٢٣٤٥٦٧٨٩';
-
-    return String(value).replace(/[۰-۹٠-٩]/g, function(ch) {
-
-        var index = persian.indexOf(ch);
-
-        if (index !== -1) {
-            return String(index);
-        }
-
-        index = arabic.indexOf(ch);
-
-        if (index !== -1) {
-            return String(index);
-        }
-
-        return ch;
-    });
-}
-
-
-/* خواندن پارامترهای آدرس */
-
-function getPageParams() {
-
-    var params = new URLSearchParams(
-        window.location.search
-    );
-
-    return params;
-}
-
-
-/* دریافت پارامتر با چند نام احتمالی */
-
-function getFirstParam(params, names) {
-
-    var i;
-    var value;
-
-    for (i = 0; i < names.length; i++) {
-
-        value = params.get(names[i]);
-
-        if (value !== null && value !== '') {
-            return value;
-        }
+    /**
+     * تبدیل اعداد فارسی و عربی به ارقام استاندارد انگلیسی
+     */
+    function normalizeDigits(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d))
+            .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+            .replace(/,/g, '.')
+            .trim();
     }
 
-    return null;
-}
-
-
-/* تبدیل مختصات به عدد */
-
-function parseCoordinate(value) {
-
-    if (value === null || value === '') {
-        return NaN;
+    /**
+     * اعتبارسنجی مختصات جغرافیایی
+     */
+    function isValidCoordinate(lat, lng) {
+        return Number.isFinite(lat) &&
+               Number.isFinite(lng) &&
+               lat >= -90 && lat <= 90 &&
+               lng >= -180 && lng <= 180;
     }
 
-    value = normalizeDigits(value);
-    value = value.trim();
-    value = value.replace(/,/g, '.');
+    /**
+     * استخراج مختصات مقصد از پارامترهای آدرس بار
+     */
+    function extractDestination() {
+        const params = new URLSearchParams(window.location.search);
 
-    return Number(value);
-}
+        // ۱. بررسی حالتی که lat و lng جداگانه آمده‌اند
+        const latKeys = ['lat', 'latitude', 'dest_lat', 'destination_lat'];
+        const lngKeys = ['lng', 'lon', 'longitude', 'dest_lng', 'destination_lng'];
 
+        let rawLat = null;
+        let rawLng = null;
 
-/* بررسی اعتبار مختصات */
+        for (const key of latKeys) {
+            if (params.has(key)) { rawLat = params.get(key); break; }
+        }
+        for (const key of lngKeys) {
+            if (params.has(key)) { rawLng = params.get(key); break; }
+        }
 
-function validCoordinates(latitude, longitude) {
+        if (rawLat && rawLng) {
+            const lat = Number(normalizeDigits(rawLat));
+            const lng = Number(normalizeDigits(rawLng));
+            if (isValidCoordinate(lat, lng)) return { lat, lng };
+        }
 
-    return isFinite(latitude) &&
-           isFinite(longitude) &&
-           latitude >= -90 &&
-           latitude <= 90 &&
-           longitude >= -180 &&
-           longitude <= 180;
-}
+        // ۲. بررسی حالتی که مختصات یکجا با کاما فرستاده شده‌اند: ?q=35.7,51.3 یا ?dest=...
+        const combinedKeys = ['q', 'loc', 'dest', 'destination', 'point'];
+        for (const key of combinedKeys) {
+            if (params.has(key)) {
+                const parts = normalizeDigits(params.get(key)).split(',');
+                if (parts.length === 2) {
+                    const lat = Number(parts[0]);
+                    const lng = Number(parts[1]);
+                    if (isValidCoordinate(lat, lng)) return { lat, lng };
+                }
+            }
+        }
 
-
-/* خواندن مقصد از QR */
-
-var params = getPageParams();
-
-var latValue = getFirstParam(params, [
-    'lat',
-    'latitude',
-    'dest_lat',
-    'destination_lat'
-]);
-
-var lngValue = getFirstParam(params, [
-    'lng',
-    'lon',
-    'longitude',
-    'dest_lng',
-    'destination_lng'
-]);
-
-var lat = parseCoordinate(latValue);
-var lng = parseCoordinate(lngValue);
-
-var destinationIsValid = validCoordinates(lat, lng);
-
-
-/* ساخت لینک دقیق نشان */
-
-function openNeshan(targetLat, targetLng) {
-
-    targetLat = Number(targetLat);
-    targetLng = Number(targetLng);
-
-    if (!validCoordinates(targetLat, targetLng)) {
         return null;
     }
 
-    var url =
-        'https://nshn.ir/?origin=' +
-        ORIGIN_LAT + ',' + ORIGIN_LNG +
-        '&destination=' +
-        targetLat.toFixed(8) + ',' +
-        targetLng.toFixed(8);
+    // مقداردهی و اتصال لینک‌ها
+    (function init() {
+        const dest = extractDestination();
+        const errorState = document.getElementById('errorState');
+        const actionLinks = document.getElementById('actionLinks');
+        const coordsDisplay = document.getElementById('coordsDisplay');
+        const copyBtn = document.getElementById('copyBtn');
 
-    return url;
-}
+        if (!dest) {
+            errorState.style.display = 'block';
+            actionLinks.style.display = 'none';
+            coordsDisplay.textContent = 'نامعتبر';
+            document.getElementById('debugUrl').textContent = window.location.href;
+            copyBtn.style.display = 'none';
+            return;
+        }
 
+        const formattedLat = dest.lat.toFixed(6);
+        const formattedLng = dest.lng.toFixed(6);
+        const coordString = `${formattedLat}, ${formattedLng}`;
 
-/* نمایش مختصات و آماده‌سازی لینک‌ها */
+        coordsDisplay.textContent = coordString;
 
-if (destinationIsValid) {
+        // کپی مختصات در کلیپ‌بورد با لمس دکمه
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(`${dest.lat},${dest.lng}`).then(() => {
+                copyBtn.textContent = 'کپی شد!';
+                setTimeout(() => copyBtn.textContent = 'کپی', 1800);
+            });
+        });
 
-    document.getElementById('destinationCoordinates').textContent =
-        lat.toFixed(8) + ' , ' + lng.toFixed(8);
+        // ۱. لینک نشان (رسم مسیر از مبدأ به مقصد)
+        document.getElementById('neshanBtn').href = 
+            `https://nshn.ir/?origin=${ORIGIN.lat},${ORIGIN.lng}&destination=${dest.lat},${dest.lng}`;
 
-    /* نشان */
+        // ۲. لینک بلد (مسیریابی بین دو نقطه)
+        document.getElementById('baladBtn').href = 
+            `https://balad.ir/directions?origin=${ORIGIN.lat},${ORIGIN.lng}&destination=${dest.lat},${dest.lng}`;
 
-    document.getElementById('neshanButton').href =
-        openNeshan(lat, lng);
-
-    document.getElementById('neshanButton').className =
-        'action neshan';
-
-
-    /* بلد */
-
-    document.getElementById('baladButton').href =
-        'https://balad.ir/location?latitude=' +
-        lat +
-        '&longitude=' +
-        lng;
-
-    document.getElementById('baladButton').className =
-        'action balad';
-
-
-    /* گوگل‌مپ */
-
-    document.getElementById('googleButton').href =
-        'https://www.google.com/maps/dir/?api=1' +
-        '&origin=' + ORIGIN_LAT + ',' + ORIGIN_LNG +
-        '&destination=' + lat + ',' + lng +
-        '&travelmode=driving';
-
-    document.getElementById('googleButton').className =
-        'action google';
-
-} else {
-
-    document.getElementById('errorBox').style.display =
-        'block';
-
-    document.getElementById('destinationCoordinates').textContent =
-        'مختصات مقصد نامعتبر است';
-
-    document.getElementById('debugInfo').textContent =
-        'URL: ' + window.location.href;
-
-}
-
+        // ۳. لینک گوگل مپ (حالت Driving مستقیم)
+        document.getElementById('googleBtn').href = 
+            `https://www.google.com/maps/dir/?api=1&origin=${ORIGIN.lat},${ORIGIN.lng}&destination=${dest.lat},${dest.lng}&travelmode=driving`;
+    })();
 </script>
 
 </body>

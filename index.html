@@ -263,13 +263,20 @@ h1 {
     document.getElementById('neshanBtn').href = neshanUrl;
 
     // بلد ـ لینک جست‌وجوی مسیر با مبدأ و مقصد
-    var baladUrl =
-        'https://balad.ir/directions?origin=' +
-        encodeURIComponent(origin) +
-        '&destination=' +
-        encodeURIComponent(dest);
+// بلد ـ مسیریابی مستقیم از دفتر تا مقصد
+var originParts = origin.split(',');
+var destParts = dest.split(',');
 
-    document.getElementById('baladBtn').href = baladUrl;
+var baladOrigin = originParts[1] + ',' + originParts[0];
+var baladDestination = destParts[1] + ',' + destParts[0];
+
+var baladUrl =
+    'https://balad.ir/directions/driving?origin=' +
+    encodeURIComponent(baladOrigin) +
+    '&destination=' +
+    encodeURIComponent(baladDestination);
+
+document.getElementById('baladBtn').href = baladUrl;
 
     // گوگل‌مپ
     var googleUrl =

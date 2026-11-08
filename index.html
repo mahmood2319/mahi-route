@@ -274,22 +274,15 @@ function openChrome() {
 /* مسیریابی با نشان */
 
 function openNeshan() {
-
-    if (!validDestination || !validOrigin) {
-        showStatus('مختصات مبدأ یا مقصد معتبر نیست.');
+    if (!lat || !lng) {
+        alert('مختصات مقصد معتبر نیست.');
         return;
     }
 
-    var origin = originLat + ',' + originLng;
-    var destination = lat + ',' + lng;
-
-    var url =
-        'https://nshn.ir/?origin=' +
-        encodeURIComponent(origin) +
-        '&destination=' +
-        encodeURIComponent(destination);
-
-    showStatus('در حال باز کردن نشان...');
+    var url = 'https://nshn.ir/?lat=' +
+        encodeURIComponent(lat) +
+        '&lng=' +
+        encodeURIComponent(lng);
 
     window.location.href = url;
 }

@@ -236,6 +236,7 @@ if (validDestination) {
 }
 
 /* مسیریابی با نشان */
+
 function openNeshan() {
 
     if (!validDestination || !validOrigin) {
@@ -244,60 +245,21 @@ function openNeshan() {
         return;
     }
 
-    var destination = lat + ',' + lng;
     var origin = originLat + ',' + originLng;
+    var destination = lat + ',' + lng;
 
-    var isAndroid = /Android/i.test(navigator.userAgent);
-    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var url =
+        'https://nshn.ir/?origin=' +
+        encodeURIComponent(origin) +
+        '&destination=' +
+        encodeURIComponent(destination);
 
     document.getElementById('status').textContent =
-        'در حال باز کردن نشان...';
+        'در حال انتقال به نشان...';
 
-    if (isAndroid) {
-
-        var fallbackUrl =
-            'https://neshan.org/maps/share/' +
-            encodeURIComponent(destination);
-
-        var url =
-            'intent://nshn.ir/?origin=' +
-            encodeURIComponent(origin) +
-            '&destination=' +
-            encodeURIComponent(destination) +
-            '&type=drive' +
-            '#Intent;' +
-            'scheme=https;' +
-            'package=org.rajman.neshan.traffic.tehran.navigator;' +
-            'S.browser_fallback_url=' +
-            encodeURIComponent(fallbackUrl) +
-            ';end';
-
-        window.location.href = url;
-
-    } else if (isIOS) {
-
-        var url =
-            'neshan://?origin=' +
-            encodeURIComponent(origin) +
-            '&destination=' +
-            encodeURIComponent(destination);
-
-        window.location.href = url;
-
-    } else {
-
-        var url =
-            'https://nshn.ir/?origin=' +
-            encodeURIComponent(origin) +
-            '&destination=' +
-            encodeURIComponent(destination);
-
-        window.open(url, '_blank');
-
-        document.getElementById('status').textContent =
-            'در حال باز کردن نشان در مرورگر...';
-    }
+    window.location.href = url;
 }
+
 
 /* مشاهده مقصد در بلد */
 function openBalad() {

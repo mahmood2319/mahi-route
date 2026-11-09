@@ -3,8 +3,10 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مسیریابی مرسولات ـ نشر ماهی</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
 * {
@@ -13,95 +15,190 @@
 
 body {
     margin: 0;
-    padding: 25px 15px;
-    background: #f3f5f7;
-    color: #263238;
+    padding: 20px 12px;
+    background: #f5f1e9;
+    color: #26354a;
     font-family: Tahoma, Arial, sans-serif;
 }
 
 .container {
-    max-width: 460px;
-    margin: 30px auto;
+    max-width: 480px;
+    margin: 20px auto;
     background: #fff;
     border-radius: 18px;
-    padding: 28px 22px;
-    box-shadow: 0 5px 25px rgba(0,0,0,.08);
+    padding: 24px 20px;
+    box-shadow: 0 8px 30px rgba(30, 40, 55, .09);
+}
+
+.header {
     text-align: center;
-}
-
-.logo {
-    width: 85px;
-    height: 85px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
-h1 {
-    font-size: 21px;
-    color: #963e29;
-    margin: 8px 0;
-}
-
-.subtitle {
-    color: #777;
-    font-size: 13px;
-    line-height: 2;
     margin-bottom: 24px;
 }
 
-.nav-btn {
+.header h1 {
+    color: #9b543d;
+    font-size: 23px;
+    margin: 0 0 12px;
+}
+
+.header p {
+    color: #687386;
+    font-size: 14px;
+    line-height: 2;
+    margin: 0;
+}
+
+.section {
+    margin-top: 20px;
+}
+
+.section-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d8dce2;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #ad6b4f;
+}
+
+button {
+    border: 0;
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.primary {
+    width: 100%;
+    background: #9b543d;
+    color: white;
+    margin-top: 10px;
+}
+
+.secondary {
+    background: #eee8df;
+    color: #51483f;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#map {
+    width: 100%;
+    height: 300px;
+    border-radius: 12px;
+    margin-top: 12px;
+    border: 1px solid #ddd;
+    z-index: 1;
+}
+
+#searchResults {
+    margin-top: 10px;
+}
+
+.result-item {
     display: block;
     width: 100%;
-    padding: 16px 12px;
-    margin: 13px 0;
-    border-radius: 11px;
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: bold;
+    text-align: right;
+    background: #f7f4ef;
+    color: #334155;
+    margin-top: 7px;
+    line-height: 1.8;
 }
 
-.btn-neshan {
-    background: #159b65;
+.result-item:hover {
+    background: #eee4d8;
 }
 
-.btn-balad {
-    background: #2878c8;
-}
-
-.btn-google {
-    background: #555d69;
-}
-
-.nav-btn:active {
-    opacity: .8;
-}
-
-.coordinates {
-    margin-top: 24px;
+.status {
+    background: #f8f4ee;
+    border-radius: 10px;
     padding: 13px;
-    background: #f7f2ed;
-    border-radius: 9px;
-    font-size: 12px;
-    direction: ltr;
+    margin-top: 16px;
+    font-size: 13px;
     line-height: 2;
-    word-break: break-all;
+    color: #596579;
+    overflow-wrap: anywhere;
 }
 
 .error {
-    display: none;
-    padding: 16px;
+    color: #a33d32;
     background: #fff0ed;
-    color: #b42318;
-    border-radius: 10px;
-    line-height: 2;
-    font-size: 14px;
+}
+
+.success {
+    color: #28634c;
+    background: #edf7f0;
+}
+
+.coordinates {
+    direction: ltr;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.route-buttons {
+    display: none;
+    margin-top: 22px;
+}
+
+.route-button {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    padding: 15px;
+    border-radius: 11px;
+    margin-top: 10px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.neshan {
+    background: #159b77;
+}
+
+.balad {
+    background: #3476c5;
+}
+
+.google {
+    background: #555f70;
 }
 
 .footer {
-    margin-top: 25px;
-    color: #999;
+    text-align: center;
+    color: #9299a3;
     font-size: 11px;
+    margin-top: 25px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 400px) {
+    .container {
+        padding: 20px 15px;
+    }
+
+    .header h1 {
+        font-size: 20px;
+    }
 }
 </style>
 </head>
@@ -110,49 +207,72 @@ h1 {
 
 <div class="container">
 
-    <div id="mainContent">
-
+    <div class="header">
         <h1>مسیریابی مرسولات</h1>
+        <p id="introText">
+            آدرس مقصد را جست‌وجو کن یا روی نقشه انتخاب کن.
+        </p>
+    </div>
 
-        <div class="subtitle">
-            مقصد مرسوله آماده است.<br>
-            برنامه مسیریابی موردنظر را انتخاب کنید.
+    <div id="manualSection">
+
+        <div class="section">
+            <div class="section-title">جست‌وجوی آدرس مقصد</div>
+
+            <input
+                type="text"
+                id="addressInput"
+                placeholder="مثلاً خیابان انقلاب، تهران"
+                autocomplete="off"
+            >
+
+            <button class="primary" id="searchButton" type="button">
+                جست‌وجوی آدرس
+            </button>
+
+            <div id="searchResults"></div>
         </div>
 
-        <div id="actionLinks">
-
-            <a id="neshanBtn"
-               class="nav-btn btn-neshan"
-               target="_blank"
-               rel="noopener noreferrer">
-                مسیریابی با نشان
-            </a>
-
-            <a id="baladBtn"
-               class="nav-btn btn-balad"
-               target="_blank"
-               rel="noopener noreferrer">
-                مسیریابی با بلد
-            </a>
-
-            <a id="googleBtn"
-               class="nav-btn btn-google"
-               target="_blank"
-               rel="noopener noreferrer">
-                مسیریابی با گوگل‌مپ
-            </a>
-
+        <div class="section">
+            <div class="section-title">یا مقصد را روی نقشه انتخاب کن</div>
+            <div id="map"></div>
+            <div class="status">
+                روی محل موردنظر در نقشه کلیک کن تا مقصد انتخاب شود.
+            </div>
         </div>
 
-        <div class="coordinates">
-            <div>مختصات مقصد:</div>
-            <strong id="coordsDisplay">در حال بررسی...</strong>
-        </div>
+        <button class="primary" id="confirmButton" type="button" disabled>
+            تأیید مقصد و نمایش مسیرها
+        </button>
 
-        <div id="errorState" class="error">
-            مختصات مقصد در لینک QR پیدا نشد یا معتبر نیست.
-            لطفاً با دفتر نشر ماهی تماس بگیرید.
-        </div>
+    </div>
+
+    <div id="statusBox" class="status">
+        در انتظار انتخاب مقصد...
+    </div>
+
+    <div id="coordinates" class="coordinates"></div>
+
+    <div id="routeButtons" class="route-buttons">
+
+        <a id="neshanLink" class="route-button neshan"
+           href="#" target="_blank" rel="noopener">
+            مسیریابی با نشان
+        </a>
+
+        <a id="baladLink" class="route-button balad"
+           href="#" target="_blank" rel="noopener">
+            مسیریابی با بلد
+        </a>
+
+        <a id="googleLink" class="route-button google"
+           href="#" target="_blank" rel="noopener">
+            مسیریابی با گوگل‌مپ
+        </a>
+
+        <button id="changeDestination" class="secondary" type="button">
+            تغییر مقصد
+        </button>
 
     </div>
 
@@ -162,64 +282,77 @@ h1 {
 
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
 (function () {
 
-    // مختصات ثابت دفتر نشر ماهی
-    var ORIGIN_LAT = 35.70129294788876;
-    var ORIGIN_LNG = 51.398984197047696;
+    // مختصات تأییدشده دفتر نشر ماهی
+    var ORIGIN_LAT = 35.70069985705295;
+    var ORIGIN_LNG = 51.399384201982855;
+
+    var destination = null;
+    var map = null;
+    var marker = null;
+    var selectedAddress = '';
+
+    var manualSection = document.getElementById('manualSection');
+    var statusBox = document.getElementById('statusBox');
+    var coordinatesBox = document.getElementById('coordinates');
+    var routeButtons = document.getElementById('routeButtons');
+    var confirmButton = document.getElementById('confirmButton');
+    var introText = document.getElementById('introText');
 
     function normalizeDigits(value) {
-        return String(value || '')
-            .replace(/[۰-۹]/g, function (digit) {
-                return '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit);
-            })
-            .replace(/[٠-٩]/g, function (digit) {
-                return '٠١٢٣٤٥٦٧٨٩'.indexOf(digit);
-            })
-            .trim();
+        var persian = '۰۱۲۳۴۵۶۷۸۹';
+        var arabic = '٠١٢٣٤٥٦٧٨٩';
+
+        return String(value).replace(/[۰-۹٠-٩]/g, function (digit) {
+            var index = persian.indexOf(digit);
+
+            if (index === -1) {
+                index = arabic.indexOf(digit);
+            }
+
+            return String(index);
+        });
     }
 
-    function isValidCoordinate(lat, lng) {
+    function validCoordinates(lat, lng) {
+        lat = Number(lat);
+        lng = Number(lng);
+
         return isFinite(lat) &&
-            isFinite(lng) &&
-            lat >= -90 &&
-            lat <= 90 &&
-            lng >= -180 &&
-            lng <= 180 &&
-            !(lat === 0 && lng === 0);
+               isFinite(lng) &&
+               lat >= -90 &&
+               lat <= 90 &&
+               lng >= -180 &&
+               lng <= 180 &&
+               !(lat === 0 && lng === 0);
     }
 
     function extractDestination() {
-
         var params = new URLSearchParams(window.location.search);
 
-        var rawLat =
-            params.get('lat') ||
-            params.get('latitude') ||
-            params.get('dest_lat') ||
-            params.get('destination_lat');
+        var lat = params.get('lat') ||
+                  params.get('latitude') ||
+                  params.get('dest_lat') ||
+                  params.get('destination_lat');
 
-        var rawLng =
-            params.get('lng') ||
-            params.get('lon') ||
-            params.get('longitude') ||
-            params.get('dest_lng') ||
-            params.get('destination_lng');
+        var lng = params.get('lng') ||
+                  params.get('lon') ||
+                  params.get('longitude') ||
+                  params.get('dest_lng') ||
+                  params.get('destination_lng');
 
-        if (!rawLat || !rawLng) {
+        if (!lat || !lng) {
             return null;
         }
 
-        var lat = Number(
-            normalizeDigits(rawLat).replace(/,/g, '.')
-        );
+        lat = Number(normalizeDigits(lat));
+        lng = Number(normalizeDigits(lng));
 
-        var lng = Number(
-            normalizeDigits(rawLng).replace(/,/g, '.')
-        );
-
-        if (!isValidCoordinate(lat, lng)) {
+        if (!validCoordinates(lat, lng)) {
             return null;
         }
 
@@ -229,63 +362,249 @@ h1 {
         };
     }
 
-    var destination = extractDestination();
+    function initializeMap() {
+        if (map) {
+            setTimeout(function () {
+                map.invalidateSize();
+            }, 100);
+            return;
+        }
 
-    var errorState = document.getElementById('errorState');
-    var actionLinks = document.getElementById('actionLinks');
-    var coordsDisplay = document.getElementById('coordsDisplay');
+        map = L.map('map').setView([ORIGIN_LAT, ORIGIN_LNG], 14);
 
-    if (!destination) {
-        errorState.style.display = 'block';
-        actionLinks.style.display = 'none';
-        coordsDisplay.textContent = 'مختصات نامعتبر است';
-        return;
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        map.on('click', function (event) {
+            selectDestination(
+                event.latlng.lat,
+                event.latlng.lng,
+                'مقصد انتخاب‌شده روی نقشه'
+            );
+        });
+
+        setTimeout(function () {
+            map.invalidateSize();
+        }, 200);
     }
 
-    var origin =
-        ORIGIN_LAT.toFixed(7) + ',' +
-        ORIGIN_LNG.toFixed(7);
+    function selectDestination(lat, lng, address) {
+        if (!validCoordinates(lat, lng)) {
+            return;
+        }
 
-    var dest =
-        destination.lat.toFixed(7) + ',' +
-        destination.lng.toFixed(7);
+        destination = {
+            lat: Number(lat),
+            lng: Number(lng)
+        };
 
-    coordsDisplay.textContent = dest;
+        selectedAddress = address || 'مقصد انتخاب‌شده';
 
-    // نشان ـ فرمت آزمایش‌شده
-    var neshanUrl =
-        'https://nshn.ir/maps?origin=' +
-        origin +
-        '&destination=' +
-        dest +
-        '&type=drive';
+        if (map) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
 
-    document.getElementById('neshanBtn').href = neshanUrl;
+            marker = L.marker([destination.lat, destination.lng])
+                .addTo(map);
 
-// بلد ـ مسیریابی مستقیم از دفتر نشر ماهی تا مقصد
-// بلد ـ مسیریابی مستقیم از پلاک ۱۱۷۶، ساختمان سپیده
-var destParts = dest.split(',');
+            marker.bindPopup(selectedAddress).openPopup();
 
-var baladOrigin = '51.399384201982855,35.70069985705295';
-var baladDestination = destParts[1] + ',' + destParts[0];
+            map.setView([destination.lat, destination.lng], 16);
+        }
 
-var baladUrl =
-    'https://balad.ir/directions/driving?origin=' +
-    encodeURIComponent(baladOrigin) +
-    '&destination=' +
-    encodeURIComponent(baladDestination);
+        coordinatesBox.textContent =
+            destination.lat.toFixed(7) + ' , ' +
+            destination.lng.toFixed(7);
 
-document.getElementById('baladBtn').href = baladUrl;
+        statusBox.className = 'status success';
+        statusBox.textContent =
+            'مقصد انتخاب شد: ' + selectedAddress;
 
-    
-    // گوگل‌مپ
-    var googleUrl =
-        'https://www.google.com/maps/dir/?api=1' +
-        '&origin=' + encodeURIComponent(origin) +
-        '&destination=' + encodeURIComponent(dest) +
-        '&travelmode=driving';
+        confirmButton.disabled = false;
+    }
 
-    document.getElementById('googleBtn').href = googleUrl;
+    function showRoutes() {
+        if (!destination) {
+            return;
+        }
+
+        var origin = ORIGIN_LAT + ',' + ORIGIN_LNG;
+        var dest = destination.lat + ',' + destination.lng;
+
+        // نشان: ترتیب عرض جغرافیایی، طول جغرافیایی
+        var neshanUrl =
+            'https://nshn.ir/maps?origin=' +
+            encodeURIComponent(origin) +
+            '&destination=' +
+            encodeURIComponent(dest) +
+            '&type=drive';
+
+        // بلد: ترتیب طول جغرافیایی، عرض جغرافیایی
+        var baladOrigin = ORIGIN_LNG + ',' + ORIGIN_LAT;
+        var baladDestination = destination.lng + ',' + destination.lat;
+
+        var baladUrl =
+            'https://balad.ir/directions/driving?origin=' +
+            encodeURIComponent(baladOrigin) +
+            '&destination=' +
+            encodeURIComponent(baladDestination);
+
+        // گوگل‌مپ: ترتیب عرض جغرافیایی، طول جغرافیایی
+        var googleUrl =
+            'https://www.google.com/maps/dir/?api=1&origin=' +
+            encodeURIComponent(origin) +
+            '&destination=' +
+            encodeURIComponent(dest) +
+            '&travelmode=driving';
+
+        document.getElementById('neshanLink').href = neshanUrl;
+        document.getElementById('baladLink').href = baladUrl;
+        document.getElementById('googleLink').href = googleUrl;
+
+        manualSection.classList.add('hidden');
+        routeButtons.style.display = 'block';
+
+        introText.textContent =
+            'مقصد آماده است. برنامه مسیریابی موردنظر را انتخاب کن.';
+
+        statusBox.className = 'status success';
+        statusBox.textContent = 'مقصد با موفقیت ثبت شد.';
+
+    }
+
+    function showManualMode() {
+        manualSection.classList.remove('hidden');
+        routeButtons.style.display = 'none';
+
+        introText.textContent =
+            'آدرس مقصد را جست‌وجو کن یا روی نقشه انتخاب کن.';
+
+        initializeMap();
+    }
+
+    function showExistingQrDestination() {
+        var found = extractDestination();
+
+        if (!found) {
+            return false;
+        }
+
+        destination = found;
+        selectedAddress = 'مقصد دریافت‌شده از لینک QR';
+
+        manualSection.classList.add('hidden');
+
+        coordinatesBox.textContent =
+            destination.lat.toFixed(7) + ' , ' +
+            destination.lng.toFixed(7);
+
+        statusBox.className = 'status success';
+        statusBox.textContent =
+            'مقصد مرسوله از لینک دریافت شد.';
+
+        showRoutes();
+
+        return true;
+    }
+
+    function searchAddress() {
+        var input = document.getElementById('addressInput');
+        var query = input.value.trim();
+        var resultsBox = document.getElementById('searchResults');
+        var searchButton = document.getElementById('searchButton');
+
+        if (!query) {
+            resultsBox.textContent = 'لطفاً آدرس مقصد را وارد کن.';
+            return;
+        }
+
+        resultsBox.textContent = 'در حال جست‌وجوی آدرس...';
+        searchButton.disabled = true;
+
+        var url =
+            'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=fa&q=' +
+            encodeURIComponent(query);
+
+        fetch(url)
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت پاسخ جست‌وجو');
+                }
+
+                return response.json();
+            })
+            .then(function (results) {
+                resultsBox.innerHTML = '';
+
+                if (!results || results.length === 0) {
+                    resultsBox.textContent =
+                        'آدرسی پیدا نشد. نام خیابان یا محله را دقیق‌تر وارد کن.';
+                    return;
+                }
+
+                results.forEach(function (item) {
+                    var button = document.createElement('button');
+
+                    button.type = 'button';
+                    button.className = 'result-item';
+                    button.textContent = item.display_name;
+
+                    button.addEventListener('click', function () {
+                        var lat = Number(item.lat);
+                        var lng = Number(item.lon);
+
+                        selectDestination(lat, lng, item.display_name);
+
+                        if (map) {
+                            map.setView([lat, lng], 17);
+                        }
+
+                        resultsBox.innerHTML = '';
+                    });
+
+                    resultsBox.appendChild(button);
+                });
+            })
+            .catch(function () {
+                resultsBox.textContent =
+                    'جست‌وجوی آدرس انجام نشد. اتصال اینترنت را بررسی کن یا مقصد را روی نقشه انتخاب کن.';
+            })
+            .then(function () {
+                searchButton.disabled = false;
+            });
+    }
+
+    document.getElementById('searchButton')
+        .addEventListener('click', searchAddress);
+
+    document.getElementById('addressInput')
+        .addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                searchAddress();
+            }
+        });
+
+    confirmButton.addEventListener('click', showRoutes);
+
+    document.getElementById('changeDestination')
+        .addEventListener('click', function () {
+            destination = null;
+            selectedAddress = '';
+            coordinatesBox.textContent = '';
+            confirmButton.disabled = true;
+
+            statusBox.className = 'status';
+            statusBox.textContent = 'مقصد جدید را انتخاب کن.';
+
+            showManualMode();
+        });
+
+    if (!showExistingQrDestination()) {
+        showManualMode();
+    }
 
 })();
 </script>
